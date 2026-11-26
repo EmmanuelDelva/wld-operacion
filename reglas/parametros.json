@@ -1,9 +1,9 @@
 {
-  "version": "3",
+  "version": "4",
   "nota": "Las condiciones no bloquean: se cuentan como factores a favor y cada operación se muestra con la evidencia medida de su celda (regla, temporalidad y lado). Cualquier cambio aquí obliga a repetir las pruebas.",
   "velas": {
     "1m": 1500,
-    "5m": 500,
+    "5m": 1500,
     "15m": 1500,
     "1h": 2500,
     "4h": 500,
@@ -109,6 +109,16 @@
     "avanceMinimoR": 0.5,
     "velasDelta": 3
   },
+  "tiradorMicro": {
+    "marcos": [
+      "15m",
+      "30m",
+      "45m"
+    ],
+    "gatillo": "5m",
+    "stopMinimoPct": 0.6,
+    "stopMaximoPct": 2.0
+  },
   "fase": {
     "marco": "4h",
     "velasRango": 40
@@ -118,6 +128,11 @@
     "percentil": 80,
     "frecuenciaSesgo": 60,
     "diasMinimos": 50
+  },
+  "plan": {
+    "macro": "4h",
+    "micro": "30m",
+    "casosMinimos": 100
   },
   "evidencia": {
     "corte": "2026-09-16T00:00:00Z",

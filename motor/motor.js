@@ -587,19 +587,22 @@ function pasoTirador(o, b, i, v, T) {
   return o.estado === 'cerrada' && g.fin && o.finRecorrido;
 }
 
-// Recorre las velas de 15 m con el contexto de una temporalidad macro (1 h a 1 D).
-// La zona y el régimen salen de la última vela macro cerrada; el disparo, de una vela de 15 m que
+// Recorre las velas del disparo con el contexto de la temporalidad de la idea.
+// Idea de 1 h a 1 D: disparo en 15 m. Idea de 15 a 45 m: disparo en 5 m (ctx.gatillo), con sus límites de stop.
+// La zona y el régimen salen de la última vela cerrada de la idea; el disparo, de una vela que
 // cierra rompiendo el extremo de las tres anteriores, cerca de su propio extremo y sin ser un latigazo.
-// El stop va detrás del extremo de las últimas velas de 15 m; si queda muy lejos o el objetivo no paga
+// El stop va detrás del extremo de las últimas velas del disparo; si queda muy lejos o el objetivo no paga
 // al menos 2 R netos, no hay entrada y se espera otra estructura.
 export function simularTirador(p15, pM, marco, P, ctx = {}) {
-  const T = P.tirador;
+  const T = ctx.ajustes ? { ...P.tirador, ...ctx.ajustes } : P.tirador;
+  const gatilloMarco = ctx.gatillo || '15m';
+  const mg = NATIVAS[gatilloMarco];
   const R = P.retroceso;
   const v = p15.velas;
   const n = v.length;
   const minutos = NATIVAS[marco] || ARMADAS[marco][1];
-  const vence = Math.round(R.vencimientoVelas * minutos / 15);
-  const espera = Math.round(R.velasEspera * minutos / 15);
+  const vence = Math.round(R.vencimientoVelas * minutos / mg);
+  const espera = Math.round(R.velasEspera * minutos / mg);
   const ops = [];
   const seguimiento = [];
   let j = -1;
@@ -663,6 +666,7 @@ export function simularTirador(p15, pM, marco, P, ctx = {}) {
       objetivo1: conPrevio ? previo : entrada + lado * T.parcialMinimoR * riesgo,
       objetivo2,
       invalidaMacro: z.invalida,
+      gatilloMarco, minutosGatillo: mg,
       conPrevio,
       vence, costoR,
       toco1: false,
@@ -687,7 +691,7 @@ export function simularTirador(p15, pM, marco, P, ctx = {}) {
     const u = n - 1;
     let gatillo = lado < 0 ? Infinity : -Infinity;
     for (let k = u - T.velasRuptura + 1; k <= u; k++) gatillo = lado < 0 ? Math.min(gatillo, v[k].l) : Math.max(gatillo, v[k].h);
-    vivo = { estado: dentro ? 'apuntando' : 'preparando', lado, ...z, gatillo, armada: dentro ? true : armada === lado, factores: factores(pM, j, lado, 'retroceso', P, ctx) };
+    vivo = { estado: dentro ? 'apuntando' : 'preparando', lado, ...z, gatillo, gatilloMarco, limites: [T.stopMinimoPct, T.stopMaximoPct], armada: dentro ? true : armada === lado, factores: factores(pM, j, lado, 'retroceso', P, ctx) };
   }
   return { ops, vivo };
 }
@@ -798,6 +802,79 @@ export function mapaDelDia(v1d, v1h, precio, M, ahora = Date.now()) {
   return { apertura, maximo, minimo, techo, piso, bloques };
 }
 
+// ---------- Plan por horario ----------
+
+const BLOQUE = 360 * MIN;
+const HORAS_BLOQUE = ['18:00–00:00', '00:00–06:00', '06:00–12:00', '12:00–18:00'];
+
+// Bloques de 6 horas (el día empieza a las 00:00 UTC, las 18:00 en Guadalajara) con el contexto que había
+// al empezar cada uno: la dirección del macro y la del micro en su última vela ya cerrada.
+// Es el mismo recorrido para la app (últimos días) y para la medición (toda la historia).
+export function bloquesDelPlan(p15, pMacro, pMicro, C) {
+  const filas = [];
+  let g = null;
+  for (const b of p15.velas) {
+    const t0 = Math.floor(b.t / BLOQUE) * BLOQUE;
+    if (!g || g.t !== t0) {
+      g = {
+        t: t0, k: Math.floor((t0 % DIA) / BLOQUE),
+        macro: direccionEn(pMacro, ultimaCerrada(pMacro, t0), C),
+        micro: direccionEn(pMicro, ultimaCerrada(pMicro, t0), C),
+        o: b.o, h: b.h, l: b.l, c: b.c, iH: 0, iL: 0, n: 0, completo: b.t === t0,
+      };
+      filas.push(g);
+    }
+    if (b.h > g.h) { g.h = b.h; g.iH = g.n; }
+    if (b.l < g.l) { g.l = b.l; g.iL = g.n; }
+    g.c = b.c;
+    g.n++;
+  }
+  for (const x of filas) x.completo = x.completo && x.n === 24;
+  return filas;
+}
+
+// El plan de cada bloque: su dirección sale del macro; si el macro no tiene, del micro.
+// Devuelve el bloque en curso, los tres que siguen y el registro de lo que hicieron los ya cerrados.
+export function planDelDia(p15, pMacro, pMicro, precio, C, ahora = Date.now()) {
+  const filas = bloquesDelPlan(p15, pMacro, pMicro, C);
+  const t0 = Math.floor(ahora / BLOQUE) * BLOQUE;
+  const registro = [];
+  let enCurso = null;
+  for (const g of filas) {
+    if (g.t === t0) { enCurso = g; continue; }
+    if (!g.completo) continue;
+    const d = g.macro !== 0 ? g.macro : g.micro;
+    const cambio = 100 * (g.c / g.o - 1);
+    registro.push({
+      t: g.t, k: g.k, horas: HORAS_BLOQUE[g.k], macro: g.macro, micro: g.micro, direccion: d,
+      apertura: g.o, cierre: g.c, cambio,
+      arriba: 100 * (g.h / g.o - 1), abajo: 100 * (1 - g.l / g.o),
+      primero: g.iH < g.iL ? 'arriba' : g.iL < g.iH ? 'abajo' : 'igual',
+      acerto: d === 0 || cambio === 0 ? null : Math.sign(cambio) === d,
+    });
+  }
+  registro.reverse();
+  const conDireccion = registro.filter(r => r.acerto != null);
+  const macroAhora = direccionEn(pMacro, pMacro.velas.length - 1, C);
+  const microAhora = direccionEn(pMicro, pMicro.velas.length - 1, C);
+  const bloques = [0, 1, 2, 3].map(q => {
+    const t = t0 + q * BLOQUE;
+    const k = Math.floor((t % DIA) / BLOQUE);
+    if (q > 0) return { t, k, horas: HORAS_BLOQUE[k], estado: 'por venir', macro: macroAhora, micro: microAhora, direccion: macroAhora !== 0 ? macroAhora : microAhora, falta: t - ahora };
+    const g = enCurso;
+    const macro = g ? g.macro : macroAhora;
+    const micro = g ? g.micro : microAhora;
+    const apertura = g ? g.o : precio;
+    return {
+      t, k, horas: HORAS_BLOQUE[k], estado: 'en curso', macro, micro, direccion: macro !== 0 ? macro : micro,
+      macroAhora, microAhora, apertura,
+      maximo: g ? Math.max(g.h, precio) : precio, minimo: g ? Math.min(g.l, precio) : precio,
+      cambio: 100 * (precio / apertura - 1), restante: t + BLOQUE - ahora,
+    };
+  });
+  return { bloques, registro, cuenta: { n: conDireccion.length, aciertos: conDireccion.filter(r => r.acerto).length } };
+}
+
 function leerBtc(series, btc, P) {
   const marcos = {};
   for (const m of ['1d', '4h', '1h']) marcos[m] = leerMarco(btc[m], P.contexto);
@@ -862,7 +939,7 @@ export function elegirPrincipal(porMarco, operables, ahora, mando, pesoEvidencia
         if (falta > 1.5 * Math.abs(x.invalida - x.ideal) || x.armada === false) estado = 'lejos';
       }
       const minutos = NATIVAS[marco] || ARMADAS[marco][1];
-      if (estado === 'en operación' && ahora - x.op.t <= (regla === 'tirador' ? 4 * 15 : 2 * minutos) * MIN) estado = 'reciente';
+      if (estado === 'en operación' && ahora - x.op.t <= (regla === 'tirador' ? 4 * (x.op.minutosGatillo || 15) : 2 * minutos) * MIN) estado = 'reciente';
       const f = x.op ? x.op.factores : x.factores;
       const lado = x.op ? x.op.lado : x.lado;
       const conFondo = mando && mando.direccionFondo !== 0 && lado === mando.direccionFondo;
@@ -918,6 +995,8 @@ export async function leerEstado({ simbolo = 'WLDUSDT', parametros: P, traer = f
   const prep = {};
   const prepBtc = {};
   for (const m of [...P.operables, '1w']) prep[m] = preparar(series[m], P.contexto);
+  const TM = P.tiradorMicro;
+  if (TM) prep[TM.gatillo] = preparar(series[TM.gatillo], P.contexto);
   for (const m of P.operables) if (btc[m]) prepBtc[m] = preparar(btc[m], P.contexto);
 
   const porMarco = {};
@@ -929,6 +1008,15 @@ export async function leerEstado({ simbolo = 'WLDUSDT', parametros: P, traer = f
   }
   for (const m of P.tirador.marcos) {
     const r = simularTirador(prep['15m'], prep[m], m, P, { superior: prep[P.superior[m]], btc: prepBtc[m] });
+    porMarco[m].tirador = r.vivo;
+    for (const o of r.ops) todas.push(o);
+  }
+  // Francotirador de las temporalidades chicas: la idea en 15 a 45 m y el disparo en 5 m.
+  if (TM) for (const m of TM.marcos) {
+    const r = simularTirador(prep[TM.gatillo], prep[m], m, P, {
+      superior: prep[P.superior[m]], btc: prepBtc[m], gatillo: TM.gatillo,
+      ajustes: { stopMinimoPct: TM.stopMinimoPct, stopMaximoPct: TM.stopMaximoPct },
+    });
     porMarco[m].tirador = r.vivo;
     for (const o of r.ops) todas.push(o);
   }
@@ -954,6 +1042,7 @@ export async function leerEstado({ simbolo = 'WLDUSDT', parametros: P, traer = f
     fase: leerFase(prep[P.fase.marco], P.fase),
     btc: bt ? leerBtc(series, btc, P) : null,
     mapa: mapaDelDia(series['1d'], series['1h'], precio, P.mapaDelDia, ahora),
+    plan: planDelDia(prep['15m'], prep[P.plan.macro], prep[P.plan.micro], precio, P.contexto, ahora),
     operables: P.operables,
     porMarco,
     vigentes: todas.filter(o => o.estado === 'abierta'),

@@ -1,6 +1,6 @@
 {
- "hecho": "2026-11-26T01:25:36.917Z",
- "huella": "f58d85a26b187c2a",
+ "hecho": "2026-11-26T01:46:21.307Z",
+ "huella": "b7e71842641fbdce",
  "desde": "2023-07-24",
  "corte": "2026-09-16",
  "costoPct": 0.2,
@@ -41,6 +41,14 @@
     "caida": 13.953,
     "toco1": 43,
     "objetivo2": 27
+   },
+   "conCuatroOMas": {
+    "n": 157,
+    "neto": -0.287,
+    "factor": 0.656,
+    "caida": 45.044,
+    "toco1": 31,
+    "objetivo2": 18
    },
    "gestion": {
     "stopALaEntrada": -0.187,
@@ -110,6 +118,14 @@
     "toco1": 39,
     "objetivo2": 23
    },
+   "conCuatroOMas": {
+    "n": 120,
+    "neto": 0.006,
+    "factor": 1.008,
+    "caida": 15.041,
+    "toco1": 40,
+    "objetivo2": 27
+   },
    "gestion": {
     "stopALaEntrada": -0.068,
     "parcialYStopMovil": -0.097
@@ -176,6 +192,14 @@
     "factor": 0.753,
     "caida": 35.296,
     "toco1": 25,
+    "objetivo2": 18
+   },
+   "conCuatroOMas": {
+    "n": 122,
+    "neto": -0.218,
+    "factor": 0.741,
+    "caida": 31.089,
+    "toco1": 28,
     "objetivo2": 18
    },
    "gestion": {
@@ -246,6 +270,14 @@
     "toco1": 26,
     "objetivo2": 16
    },
+   "conCuatroOMas": {
+    "n": 78,
+    "neto": 0.037,
+    "factor": 1.046,
+    "caida": 16.727,
+    "toco1": 41,
+    "objetivo2": 26
+   },
    "gestion": {
     "stopALaEntrada": -0.206,
     "parcialYStopMovil": -0.123
@@ -313,6 +345,14 @@
     "caida": 20.484,
     "toco1": 32,
     "objetivo2": 20
+   },
+   "conCuatroOMas": {
+    "n": 118,
+    "neto": 0.331,
+    "factor": 1.445,
+    "caida": 17.503,
+    "toco1": 39,
+    "objetivo2": 25
    },
    "gestion": {
     "stopALaEntrada": 0.068,
@@ -382,6 +422,14 @@
     "toco1": 31,
     "objetivo2": 24
    },
+   "conCuatroOMas": {
+    "n": 82,
+    "neto": -0.245,
+    "factor": 0.733,
+    "caida": 30.288,
+    "toco1": 26,
+    "objetivo2": 16
+   },
    "gestion": {
     "stopALaEntrada": -0.073,
     "parcialYStopMovil": -0.035
@@ -449,6 +497,14 @@
     "caida": 13.483,
     "toco1": 35,
     "objetivo2": 23
+   },
+   "conCuatroOMas": {
+    "n": 111,
+    "neto": 0.551,
+    "factor": 1.733,
+    "caida": 9.939,
+    "toco1": 39,
+    "objetivo2": 25
    },
    "gestion": {
     "stopALaEntrada": 0.195,
@@ -518,6 +574,14 @@
     "toco1": 46,
     "objetivo2": 29
    },
+   "conCuatroOMas": {
+    "n": 69,
+    "neto": -0.344,
+    "factor": 0.636,
+    "caida": 41.863,
+    "toco1": 26,
+    "objetivo2": 12
+   },
    "gestion": {
     "stopALaEntrada": -0.029,
     "parcialYStopMovil": -0.024
@@ -580,6 +644,14 @@
     "caida": 12.472,
     "toco1": 24,
     "objetivo2": 16
+   },
+   "conCuatroOMas": {
+    "n": 13,
+    "neto": 0.943,
+    "factor": 2.021,
+    "caida": 6.575,
+    "toco1": 15,
+    "objetivo2": 15
    },
    "gestion": {
     "stopALaEntrada": 0.817,
@@ -649,6 +721,14 @@
     "toco1": 19,
     "objetivo2": 10
    },
+   "conCuatroOMas": {
+    "n": 10,
+    "neto": -1.104,
+    "factor": 0,
+    "caida": 11.043,
+    "toco1": 20,
+    "objetivo2": 0
+   },
    "gestion": {
     "stopALaEntrada": 0.312,
     "parcialYStopMovil": -0.019
@@ -680,6 +760,462 @@
    },
    "stopMedioPct": 2.247,
    "fundingMedioR": -0.028
+  },
+  "tirador|15m|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 1649,
+    "neto": -0.135,
+    "factor": 0.835,
+    "caida": 263.688,
+    "toco1": 38,
+    "objetivo2": 20,
+    "conEstres": -0.256,
+    "piso": -0.216
+   },
+   "limpio": {
+    "n": 113,
+    "neto": -0.208,
+    "factor": 0.745,
+    "caida": 32.14,
+    "toco1": 35,
+    "objetivo2": 19
+   },
+   "conTresOMas": {
+    "n": 1170,
+    "neto": -0.099,
+    "factor": 0.875,
+    "caida": 142.195,
+    "toco1": 39,
+    "objetivo2": 20
+   },
+   "conMenos": {
+    "n": 479,
+    "neto": -0.223,
+    "factor": 0.742,
+    "caida": 126.945,
+    "toco1": 37,
+    "objetivo2": 19
+   },
+   "conCuatroOMas": {
+    "n": 491,
+    "neto": -0.11,
+    "factor": 0.857,
+    "caida": 76.841,
+    "toco1": 37,
+    "objetivo2": 18
+   },
+   "gestion": {
+    "stopALaEntrada": -0.15,
+    "parcialYStopMovil": -0.177
+   },
+   "flujo": {
+    "aFavor": {
+     "n": 1364,
+     "neto": -0.146,
+     "factor": 0.822,
+     "caida": 232.287,
+     "toco1": 39,
+     "objetivo2": 20
+    },
+    "enContra": {
+     "n": 285,
+     "neto": -0.083,
+     "factor": 0.897,
+     "caida": 45.37,
+     "toco1": 37,
+     "objetivo2": 22
+    }
+   },
+   "recorrido": {
+    "1": 52,
+    "2": 32,
+    "3": 20,
+    "4": 13,
+    "5": 8
+   },
+   "stopMedioPct": 0.917,
+   "fundingMedioR": 0
+  },
+  "tirador|15m|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 1355,
+    "neto": -0.234,
+    "factor": 0.726,
+    "caida": 323.877,
+    "toco1": 33,
+    "objetivo2": 18,
+    "conEstres": -0.353,
+    "piso": -0.321
+   },
+   "limpio": {
+    "n": 82,
+    "neto": -0.238,
+    "factor": 0.727,
+    "caida": 28.849,
+    "toco1": 30,
+    "objetivo2": 18
+   },
+   "conTresOMas": {
+    "n": 1000,
+    "neto": -0.268,
+    "factor": 0.691,
+    "caida": 273.264,
+    "toco1": 32,
+    "objetivo2": 18
+   },
+   "conMenos": {
+    "n": 355,
+    "neto": -0.139,
+    "factor": 0.829,
+    "caida": 66.411,
+    "toco1": 37,
+    "objetivo2": 21
+   },
+   "conCuatroOMas": {
+    "n": 454,
+    "neto": -0.307,
+    "factor": 0.647,
+    "caida": 143.013,
+    "toco1": 30,
+    "objetivo2": 17
+   },
+   "gestion": {
+    "stopALaEntrada": -0.249,
+    "parcialYStopMovil": -0.236
+   },
+   "flujo": {
+    "aFavor": {
+     "n": 1042,
+     "neto": -0.265,
+     "factor": 0.695,
+     "caida": 280.413,
+     "toco1": 32,
+     "objetivo2": 18
+    },
+    "enContra": {
+     "n": 313,
+     "neto": -0.134,
+     "factor": 0.834,
+     "caida": 57.821,
+     "toco1": 38,
+     "objetivo2": 20
+    }
+   },
+   "recorrido": {
+    "1": 48,
+    "2": 30,
+    "3": 18,
+    "4": 13,
+    "5": 8
+   },
+   "stopMedioPct": 0.952,
+   "fundingMedioR": -0.002
+  },
+  "tirador|30m|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 1361,
+    "neto": -0.104,
+    "factor": 0.881,
+    "caida": 175.413,
+    "toco1": 34,
+    "objetivo2": 18,
+    "conEstres": -0.215,
+    "piso": -0.208
+   },
+   "limpio": {
+    "n": 102,
+    "neto": -0.292,
+    "factor": 0.683,
+    "caida": 33.426,
+    "toco1": 32,
+    "objetivo2": 15
+   },
+   "conTresOMas": {
+    "n": 971,
+    "neto": -0.067,
+    "factor": 0.923,
+    "caida": 83.804,
+    "toco1": 34,
+    "objetivo2": 18
+   },
+   "conMenos": {
+    "n": 390,
+    "neto": -0.198,
+    "factor": 0.785,
+    "caida": 95.41,
+    "toco1": 32,
+    "objetivo2": 17
+   },
+   "conCuatroOMas": {
+    "n": 424,
+    "neto": -0.124,
+    "factor": 0.853,
+    "caida": 56.715,
+    "toco1": 33,
+    "objetivo2": 17
+   },
+   "gestion": {
+    "stopALaEntrada": -0.107,
+    "parcialYStopMovil": -0.196
+   },
+   "flujo": {
+    "aFavor": {
+     "n": 1149,
+     "neto": -0.118,
+     "factor": 0.866,
+     "caida": 176.545,
+     "toco1": 33,
+     "objetivo2": 18
+    },
+    "enContra": {
+     "n": 212,
+     "neto": -0.031,
+     "factor": 0.965,
+     "caida": 30.9,
+     "toco1": 37,
+     "objetivo2": 18
+    }
+   },
+   "recorrido": {
+    "1": 52,
+    "2": 34,
+    "3": 23,
+    "4": 17,
+    "5": 12
+   },
+   "stopMedioPct": 1.009,
+   "fundingMedioR": 0
+  },
+  "tirador|30m|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 1077,
+    "neto": -0.219,
+    "factor": 0.762,
+    "caida": 249.128,
+    "toco1": 33,
+    "objetivo2": 16,
+    "conEstres": -0.328,
+    "piso": -0.333
+   },
+   "limpio": {
+    "n": 56,
+    "neto": -0.038,
+    "factor": 0.955,
+    "caida": 12.051,
+    "toco1": 34,
+    "objetivo2": 18
+   },
+   "conTresOMas": {
+    "n": 809,
+    "neto": -0.229,
+    "factor": 0.751,
+    "caida": 191.551,
+    "toco1": 32,
+    "objetivo2": 16
+   },
+   "conMenos": {
+    "n": 268,
+    "neto": -0.188,
+    "factor": 0.796,
+    "caida": 63.82,
+    "toco1": 33,
+    "objetivo2": 18
+   },
+   "conCuatroOMas": {
+    "n": 365,
+    "neto": -0.168,
+    "factor": 0.812,
+    "caida": 80.095,
+    "toco1": 35,
+    "objetivo2": 17
+   },
+   "gestion": {
+    "stopALaEntrada": -0.212,
+    "parcialYStopMovil": -0.226
+   },
+   "flujo": {
+    "aFavor": {
+     "n": 834,
+     "neto": -0.201,
+     "factor": 0.78,
+     "caida": 183.226,
+     "toco1": 33,
+     "objetivo2": 17
+    },
+    "enContra": {
+     "n": 243,
+     "neto": -0.279,
+     "factor": 0.704,
+     "caida": 74.316,
+     "toco1": 30,
+     "objetivo2": 16
+    }
+   },
+   "recorrido": {
+    "1": 48,
+    "2": 32,
+    "3": 23,
+    "4": 16,
+    "5": 12
+   },
+   "stopMedioPct": 1.04,
+   "fundingMedioR": -0.002
+  },
+  "tirador|45m|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 1167,
+    "neto": -0.166,
+    "factor": 0.821,
+    "caida": 220.257,
+    "toco1": 31,
+    "objetivo2": 19,
+    "conEstres": -0.277,
+    "piso": -0.28
+   },
+   "limpio": {
+    "n": 109,
+    "neto": -0.395,
+    "factor": 0.593,
+    "caida": 46.628,
+    "toco1": 29,
+    "objetivo2": 16
+   },
+   "conTresOMas": {
+    "n": 843,
+    "neto": -0.182,
+    "factor": 0.803,
+    "caida": 165.87,
+    "toco1": 29,
+    "objetivo2": 18
+   },
+   "conMenos": {
+    "n": 324,
+    "neto": -0.123,
+    "factor": 0.867,
+    "caida": 69.865,
+    "toco1": 35,
+    "objetivo2": 20
+   },
+   "conCuatroOMas": {
+    "n": 397,
+    "neto": -0.15,
+    "factor": 0.834,
+    "caida": 79.473,
+    "toco1": 30,
+    "objetivo2": 19
+   },
+   "gestion": {
+    "stopALaEntrada": -0.169,
+    "parcialYStopMovil": -0.251
+   },
+   "flujo": {
+    "aFavor": {
+     "n": 1001,
+     "neto": -0.187,
+     "factor": 0.799,
+     "caida": 204.005,
+     "toco1": 30,
+     "objetivo2": 18
+    },
+    "enContra": {
+     "n": 166,
+     "neto": -0.041,
+     "factor": 0.955,
+     "caida": 26.301,
+     "toco1": 35,
+     "objetivo2": 22
+    }
+   },
+   "recorrido": {
+    "1": 51,
+    "2": 33,
+    "3": 24,
+    "4": 17,
+    "5": 14
+   },
+   "stopMedioPct": 1.015,
+   "fundingMedioR": 0
+  },
+  "tirador|45m|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 901,
+    "neto": -0.223,
+    "factor": 0.762,
+    "caida": 208.279,
+    "toco1": 32,
+    "objetivo2": 19,
+    "conEstres": -0.325,
+    "piso": -0.35
+   },
+   "limpio": {
+    "n": 59,
+    "neto": -0.022,
+    "factor": 0.975,
+    "caida": 18.211,
+    "toco1": 36,
+    "objetivo2": 24
+   },
+   "conTresOMas": {
+    "n": 672,
+    "neto": -0.258,
+    "factor": 0.728,
+    "caida": 193.036,
+    "toco1": 31,
+    "objetivo2": 18
+   },
+   "conMenos": {
+    "n": 229,
+    "neto": -0.12,
+    "factor": 0.868,
+    "caida": 36.587,
+    "toco1": 34,
+    "objetivo2": 22
+   },
+   "conCuatroOMas": {
+    "n": 310,
+    "neto": -0.3,
+    "factor": 0.685,
+    "caida": 99.986,
+    "toco1": 30,
+    "objetivo2": 18
+   },
+   "gestion": {
+    "stopALaEntrada": -0.214,
+    "parcialYStopMovil": -0.235
+   },
+   "flujo": {
+    "aFavor": {
+     "n": 700,
+     "neto": -0.244,
+     "factor": 0.742,
+     "caida": 183.718,
+     "toco1": 31,
+     "objetivo2": 18
+    },
+    "enContra": {
+     "n": 201,
+     "neto": -0.15,
+     "factor": 0.836,
+     "caida": 44.68,
+     "toco1": 34,
+     "objetivo2": 21
+    }
+   },
+   "recorrido": {
+    "1": 48,
+    "2": 31,
+    "3": 23,
+    "4": 16,
+    "5": 13
+   },
+   "stopMedioPct": 1.108,
+   "fundingMedioR": -0.002
   },
   "zona|15m|corto": {
    "etiqueta": "sin ventaja",
@@ -3745,6 +4281,833 @@
     "netoPct": -0.631,
     "netoR": -0.254,
     "perdidasSeguidas": 3
+   }
+  }
+ },
+ "plan": {
+  "macro": "4h",
+  "micro": "30m",
+  "base": {
+   "n": 4882,
+   "baja": 53,
+   "sube": 47
+  },
+  "resumen": {
+   "alineados": {
+    "historia": {
+     "n": 2446,
+     "aFavor": 49.8,
+     "medio": 0.1
+    },
+    "limpio": {
+     "n": 156,
+     "aFavor": 48.1,
+     "medio": 0.06
+    }
+   },
+   "alineados a la baja": {
+    "historia": {
+     "n": 1518,
+     "aFavor": 51.6,
+     "medio": 0.07
+    },
+    "limpio": {
+     "n": 108,
+     "aFavor": 49.1,
+     "medio": 0.06
+    }
+   },
+   "alineados al alza": {
+    "historia": {
+     "n": 928,
+     "aFavor": 46.8,
+     "medio": 0.17
+    },
+    "limpio": {
+     "n": 48,
+     "aFavor": 45.8,
+     "medio": 0.04
+    }
+   },
+   "micro en contra": {
+    "historia": {
+     "n": 986,
+     "aFavor": 51.2,
+     "medio": 0.07
+    },
+    "limpio": {
+     "n": 61,
+     "aFavor": 55.7,
+     "medio": 0.17
+    }
+   },
+   "micro lateral": {
+    "historia": {
+     "n": 540,
+     "aFavor": 48.9,
+     "medio": 0.04
+    },
+    "limpio": {
+     "n": 38,
+     "aFavor": 47.4,
+     "medio": 0.44
+    }
+   },
+   "solo micro": {
+    "historia": {
+     "n": 530,
+     "aFavor": 49.4,
+     "medio": -0.22
+    },
+    "limpio": {
+     "n": 27,
+     "aFavor": 66.7,
+     "medio": 1.05
+    }
+   },
+   "con dirección": {
+    "historia": {
+     "n": 4502,
+     "aFavor": 49.9,
+     "medio": 0.05
+    },
+    "limpio": {
+     "n": 282,
+     "aFavor": 51.4,
+     "medio": 0.23
+    }
+   }
+  },
+  "horas": [
+   {
+    "n": 1220,
+    "sube": 49,
+    "baja": 50,
+    "arriba": {
+     "med": 1.71,
+     "p80": 3.65
+    },
+    "abajo": {
+     "med": 1.68,
+     "p80": 3.56
+    },
+    "primeroArriba": 48,
+    "primeroAbajo": 51,
+    "historia": {
+     "n": 1149,
+     "sube": 50,
+     "baja": 50
+    },
+    "limpio": {
+     "n": 71,
+     "sube": 39,
+     "baja": 61
+    },
+    "porAnio": {
+     "2023": {
+      "n": 160,
+      "sube": 49,
+      "baja": 51
+     },
+     "2024": {
+      "n": 366,
+      "sube": 55,
+      "baja": 45
+     },
+     "2025": {
+      "n": 365,
+      "sube": 47,
+      "baja": 52
+     },
+     "2026": {
+      "n": 329,
+      "sube": 46,
+      "baja": 54
+     }
+    }
+   },
+   {
+    "n": 1220,
+    "sube": 46,
+    "baja": 54,
+    "arriba": {
+     "med": 1.39,
+     "p80": 3.36
+    },
+    "abajo": {
+     "med": 1.7,
+     "p80": 3.24
+    },
+    "primeroArriba": 53,
+    "primeroAbajo": 47,
+    "historia": {
+     "n": 1149,
+     "sube": 45,
+     "baja": 55
+    },
+    "limpio": {
+     "n": 71,
+     "sube": 55,
+     "baja": 45
+    },
+    "porAnio": {
+     "2023": {
+      "n": 160,
+      "sube": 48,
+      "baja": 53
+     },
+     "2024": {
+      "n": 366,
+      "sube": 44,
+      "baja": 56
+     },
+     "2025": {
+      "n": 365,
+      "sube": 44,
+      "baja": 56
+     },
+     "2026": {
+      "n": 329,
+      "sube": 48,
+      "baja": 52
+     }
+    }
+   },
+   {
+    "n": 1221,
+    "sube": 44,
+    "baja": 56,
+    "arriba": {
+     "med": 1.8,
+     "p80": 4.2
+    },
+    "abajo": {
+     "med": 2.27,
+     "p80": 4.58
+    },
+    "primeroArriba": 56,
+    "primeroAbajo": 44,
+    "historia": {
+     "n": 1150,
+     "sube": 44,
+     "baja": 56
+    },
+    "limpio": {
+     "n": 71,
+     "sube": 38,
+     "baja": 62
+    },
+    "porAnio": {
+     "2023": {
+      "n": 161,
+      "sube": 40,
+      "baja": 60
+     },
+     "2024": {
+      "n": 366,
+      "sube": 41,
+      "baja": 59
+     },
+     "2025": {
+      "n": 365,
+      "sube": 44,
+      "baja": 56
+     },
+     "2026": {
+      "n": 329,
+      "sube": 47,
+      "baja": 52
+     }
+    }
+   },
+   {
+    "n": 1221,
+    "sube": 48,
+    "baja": 52,
+    "arriba": {
+     "med": 1.52,
+     "p80": 3.42
+    },
+    "abajo": {
+     "med": 1.63,
+     "p80": 3.58
+    },
+    "primeroArriba": 50,
+    "primeroAbajo": 50,
+    "historia": {
+     "n": 1150,
+     "sube": 47,
+     "baja": 53
+    },
+    "limpio": {
+     "n": 71,
+     "sube": 55,
+     "baja": 45
+    },
+    "porAnio": {
+     "2023": {
+      "n": 161,
+      "sube": 52,
+      "baja": 48
+     },
+     "2024": {
+      "n": 366,
+      "sube": 47,
+      "baja": 53
+     },
+     "2025": {
+      "n": 365,
+      "sube": 52,
+      "baja": 48
+     },
+     "2026": {
+      "n": 329,
+      "sube": 43,
+      "baja": 57
+     }
+    }
+   }
+  ],
+  "celdas": {
+   "0|-1|-1": {
+    "n": 443,
+    "sube": 54,
+    "baja": 46,
+    "arriba": {
+     "med": 1.63,
+     "p80": 3.25
+    },
+    "abajo": {
+     "med": 1.55,
+     "p80": 3.54
+    },
+    "primeroArriba": 44,
+    "primeroAbajo": 56
+   },
+   "0|-1|0": {
+    "n": 80,
+    "sube": 46,
+    "baja": 51,
+    "arriba": {
+     "med": 1.48,
+     "p80": 2.23
+    },
+    "abajo": {
+     "med": 1.26,
+     "p80": 2.31
+    },
+    "primeroArriba": 44,
+    "primeroAbajo": 56
+   },
+   "0|-1|1": {
+    "n": 139,
+    "sube": 45,
+    "baja": 55,
+    "arriba": {
+     "med": 1.25,
+     "p80": 2.98
+    },
+    "abajo": {
+     "med": 1.55,
+     "p80": 3.03
+    },
+    "primeroArriba": 51,
+    "primeroAbajo": 48
+   },
+   "0|0|-1": {
+    "n": 65,
+    "sube": 48,
+    "baja": 52,
+    "arriba": {
+     "med": 2.14,
+     "p80": 3.62
+    },
+    "abajo": {
+     "med": 1.56,
+     "p80": 3.6
+    },
+    "primeroArriba": 49,
+    "primeroAbajo": 51
+   },
+   "0|0|0": {
+    "n": 16,
+    "sube": 38,
+    "baja": 63,
+    "arriba": {
+     "med": 2.28,
+     "p80": 4.84
+    },
+    "abajo": {
+     "med": 2.09,
+     "p80": 2.88
+    },
+    "primeroArriba": 56,
+    "primeroAbajo": 31
+   },
+   "0|0|1": {
+    "n": 74,
+    "sube": 45,
+    "baja": 55,
+    "arriba": {
+     "med": 1.72,
+     "p80": 3.94
+    },
+    "abajo": {
+     "med": 1.67,
+     "p80": 3.07
+    },
+    "primeroArriba": 57,
+    "primeroAbajo": 43
+   },
+   "0|1|-1": {
+    "n": 68,
+    "sube": 49,
+    "baja": 51,
+    "arriba": {
+     "med": 2.12,
+     "p80": 4.85
+    },
+    "abajo": {
+     "med": 2.14,
+     "p80": 3.93
+    },
+    "primeroArriba": 51,
+    "primeroAbajo": 49
+   },
+   "0|1|0": {
+    "n": 64,
+    "sube": 44,
+    "baja": 56,
+    "arriba": {
+     "med": 2.12,
+     "p80": 4.01
+    },
+    "abajo": {
+     "med": 1.93,
+     "p80": 3.94
+    },
+    "primeroArriba": 52,
+    "primeroAbajo": 48
+   },
+   "0|1|1": {
+    "n": 271,
+    "sube": 50,
+    "baja": 50,
+    "arriba": {
+     "med": 2.01,
+     "p80": 4.35
+    },
+    "abajo": {
+     "med": 2,
+     "p80": 3.65
+    },
+    "primeroArriba": 51,
+    "primeroAbajo": 48
+   },
+   "1|-1|-1": {
+    "n": 378,
+    "sube": 48,
+    "baja": 52,
+    "arriba": {
+     "med": 1.34,
+     "p80": 2.96
+    },
+    "abajo": {
+     "med": 1.55,
+     "p80": 2.81
+    },
+    "primeroArriba": 49,
+    "primeroAbajo": 50
+   },
+   "1|-1|0": {
+    "n": 100,
+    "sube": 48,
+    "baja": 51,
+    "arriba": {
+     "med": 1.15,
+     "p80": 2.9
+    },
+    "abajo": {
+     "med": 1.56,
+     "p80": 3.14
+    },
+    "primeroArriba": 53,
+    "primeroAbajo": 47
+   },
+   "1|-1|1": {
+    "n": 175,
+    "sube": 45,
+    "baja": 55,
+    "arriba": {
+     "med": 1.22,
+     "p80": 2.52
+    },
+    "abajo": {
+     "med": 1.27,
+     "p80": 2.68
+    },
+    "primeroArriba": 52,
+    "primeroAbajo": 48
+   },
+   "1|0|-1": {
+    "n": 58,
+    "sube": 38,
+    "baja": 62,
+    "arriba": {
+     "med": 1.27,
+     "p80": 2.4
+    },
+    "abajo": {
+     "med": 1.54,
+     "p80": 3.29
+    },
+    "primeroArriba": 59,
+    "primeroAbajo": 41
+   },
+   "1|0|0": {
+    "n": 32,
+    "sube": 41,
+    "baja": 59,
+    "arriba": {
+     "med": 1.67,
+     "p80": 4.45
+    },
+    "abajo": {
+     "med": 1.93,
+     "p80": 2.63
+    },
+    "primeroArriba": 41,
+    "primeroAbajo": 59
+   },
+   "1|0|1": {
+    "n": 71,
+    "sube": 44,
+    "baja": 56,
+    "arriba": {
+     "med": 1.41,
+     "p80": 3.29
+    },
+    "abajo": {
+     "med": 1.73,
+     "p80": 3.96
+    },
+    "primeroArriba": 56,
+    "primeroAbajo": 44
+   },
+   "1|1|-1": {
+    "n": 94,
+    "sube": 51,
+    "baja": 49,
+    "arriba": {
+     "med": 2.15,
+     "p80": 4.55
+    },
+    "abajo": {
+     "med": 2.03,
+     "p80": 3.42
+    },
+    "primeroArriba": 49,
+    "primeroAbajo": 51
+   },
+   "1|1|0": {
+    "n": 68,
+    "sube": 43,
+    "baja": 57,
+    "arriba": {
+     "med": 1.61,
+     "p80": 3.6
+    },
+    "abajo": {
+     "med": 2.04,
+     "p80": 3.41
+    },
+    "primeroArriba": 53,
+    "primeroAbajo": 47
+   },
+   "1|1|1": {
+    "n": 244,
+    "sube": 43,
+    "baja": 57,
+    "arriba": {
+     "med": 1.74,
+     "p80": 4.06
+    },
+    "abajo": {
+     "med": 2.19,
+     "p80": 4.13
+    },
+    "primeroArriba": 59,
+    "primeroAbajo": 41
+   },
+   "2|-1|-1": {
+    "n": 394,
+    "sube": 42,
+    "baja": 58,
+    "arriba": {
+     "med": 1.65,
+     "p80": 3.67
+    },
+    "abajo": {
+     "med": 2.12,
+     "p80": 4.32
+    },
+    "primeroArriba": 55,
+    "primeroAbajo": 45
+   },
+   "2|-1|0": {
+    "n": 89,
+    "sube": 49,
+    "baja": 51,
+    "arriba": {
+     "med": 1.86,
+     "p80": 4.02
+    },
+    "abajo": {
+     "med": 2.11,
+     "p80": 3.9
+    },
+    "primeroArriba": 52,
+    "primeroAbajo": 48
+   },
+   "2|-1|1": {
+    "n": 171,
+    "sube": 45,
+    "baja": 55,
+    "arriba": {
+     "med": 1.81,
+     "p80": 3.78
+    },
+    "abajo": {
+     "med": 2.11,
+     "p80": 4.16
+    },
+    "primeroArriba": 57,
+    "primeroAbajo": 43
+   },
+   "2|0|-1": {
+    "n": 68,
+    "sube": 37,
+    "baja": 63,
+    "arriba": {
+     "med": 1.52,
+     "p80": 4.15
+    },
+    "abajo": {
+     "med": 2.68,
+     "p80": 4.24
+    },
+    "primeroArriba": 59,
+    "primeroAbajo": 41
+   },
+   "2|0|0": {
+    "n": 32,
+    "sube": 53,
+    "baja": 47,
+    "arriba": {
+     "med": 1.8,
+     "p80": 7.63
+    },
+    "abajo": {
+     "med": 2.2,
+     "p80": 3.53
+    },
+    "primeroArriba": 50,
+    "primeroAbajo": 50
+   },
+   "2|0|1": {
+    "n": 65,
+    "sube": 40,
+    "baja": 60,
+    "arriba": {
+     "med": 1.3,
+     "p80": 3.43
+    },
+    "abajo": {
+     "med": 2.16,
+     "p80": 4.48
+    },
+    "primeroArriba": 60,
+    "primeroAbajo": 40
+   },
+   "2|1|-1": {
+    "n": 115,
+    "sube": 36,
+    "baja": 64,
+    "arriba": {
+     "med": 1.76,
+     "p80": 4.28
+    },
+    "abajo": {
+     "med": 3.05,
+     "p80": 5.44
+    },
+    "primeroArriba": 63,
+    "primeroAbajo": 37
+   },
+   "2|1|0": {
+    "n": 55,
+    "sube": 38,
+    "baja": 62,
+    "arriba": {
+     "med": 2.37,
+     "p80": 4.63
+    },
+    "abajo": {
+     "med": 2.35,
+     "p80": 4.9
+    },
+    "primeroArriba": 56,
+    "primeroAbajo": 44
+   },
+   "2|1|1": {
+    "n": 232,
+    "sube": 50,
+    "baja": 50,
+    "arriba": {
+     "med": 2.65,
+     "p80": 5.61
+    },
+    "abajo": {
+     "med": 2.44,
+     "p80": 4.85
+    },
+    "primeroArriba": 54,
+    "primeroAbajo": 46
+   },
+   "3|-1|-1": {
+    "n": 412,
+    "sube": 50,
+    "baja": 50,
+    "arriba": {
+     "med": 1.4,
+     "p80": 2.82
+    },
+    "abajo": {
+     "med": 1.77,
+     "p80": 3.9
+    },
+    "primeroArriba": 50,
+    "primeroAbajo": 50
+   },
+   "3|-1|0": {
+    "n": 78,
+    "sube": 51,
+    "baja": 49,
+    "arriba": {
+     "med": 1.6,
+     "p80": 2.87
+    },
+    "abajo": {
+     "med": 1.24,
+     "p80": 3.53
+    },
+    "primeroArriba": 45,
+    "primeroAbajo": 54
+   },
+   "3|-1|1": {
+    "n": 167,
+    "sube": 47,
+    "baja": 53,
+    "arriba": {
+     "med": 1.41,
+     "p80": 3.6
+    },
+    "abajo": {
+     "med": 1.31,
+     "p80": 2.55
+    },
+    "primeroArriba": 50,
+    "primeroAbajo": 49
+   },
+   "3|0|-1": {
+    "n": 90,
+    "sube": 43,
+    "baja": 57,
+    "arriba": {
+     "med": 1.49,
+     "p80": 3.43
+    },
+    "abajo": {
+     "med": 1.67,
+     "p80": 3.22
+    },
+    "primeroArriba": 53,
+    "primeroAbajo": 46
+   },
+   "3|0|0": {
+    "n": 13,
+    "sube": 31,
+    "baja": 69,
+    "arriba": {
+     "med": 0.99,
+     "p80": 3.35
+    },
+    "abajo": {
+     "med": 2.31,
+     "p80": 4.35
+    },
+    "primeroArriba": 54,
+    "primeroAbajo": 46
+   },
+   "3|0|1": {
+    "n": 66,
+    "sube": 39,
+    "baja": 61,
+    "arriba": {
+     "med": 1.58,
+     "p80": 3.02
+    },
+    "abajo": {
+     "med": 2.1,
+     "p80": 3.55
+    },
+    "primeroArriba": 50,
+    "primeroAbajo": 50
+   },
+   "3|1|-1": {
+    "n": 118,
+    "sube": 52,
+    "baja": 48,
+    "arriba": {
+     "med": 1.52,
+     "p80": 3.82
+    },
+    "abajo": {
+     "med": 1.67,
+     "p80": 3.76
+    },
+    "primeroArriba": 48,
+    "primeroAbajo": 51
+   },
+   "3|1|0": {
+    "n": 47,
+    "sube": 62,
+    "baja": 38,
+    "arriba": {
+     "med": 1.91,
+     "p80": 5.2
+    },
+    "abajo": {
+     "med": 1.16,
+     "p80": 2.69
+    },
+    "primeroArriba": 38,
+    "primeroAbajo": 62
+   },
+   "3|1|1": {
+    "n": 230,
+    "sube": 44,
+    "baja": 56,
+    "arriba": {
+     "med": 1.88,
+     "p80": 4.06
+    },
+    "abajo": {
+     "med": 1.87,
+     "p80": 3.76
+    },
+    "primeroArriba": 53,
+    "primeroAbajo": 47
    }
   }
  }

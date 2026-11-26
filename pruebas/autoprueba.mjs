@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import {
   agrupar, ema, atr, adx, eficiencia, percentil, cuantil, leerMarco, soloCerradas, preparar,
-  regimen, zona, simular, simularTirador, resumir, quienManda, leerFase, mapaDelDia,
+  regimen, zona, simular, simularTirador, resumir, quienManda, leerFase, mapaDelDia, bloquesDelPlan, planDelDia,
 } from '../motor/motor.js';
 
 const P = JSON.parse(await readFile(new URL('../reglas/parametros.json', import.meta.url), 'utf8'));
@@ -203,6 +203,58 @@ prueba(() => {
     if (o.motivo === 'stop') { cerca(o.bruto, -1, 1e-9); assert.ok(o.netoGestion <= o.mfe + 1e-9); }
     if (o.motivo === 'objetivo 2') { cerca(o.bruto, Math.abs(o.objetivo2 - o.entrada) / o.riesgo, 1e-9); assert.ok(o.mfe >= o.bruto - 1e-9); }
     assert.ok(o.netoBE <= Math.max(o.neto, -o.costoR) + 1e-9);
+  }
+});
+
+// Plan por horario: en una subida pareja cada bloque de 6 horas sale completo, con el mínimo al principio
+// y el máximo al final; el contexto se lee solo con velas ya cerradas y el registro acierta la dirección.
+prueba(() => {
+  const v15 = serie(96 * 20, 15, i => 100 + i * 0.05, Date.UTC(2026, 0, 5), 0.01);
+  const p15 = preparar(v15, C);
+  const p4 = preparar(agrupar(v15, 15, 240), C);
+  const p30 = preparar(agrupar(v15, 15, 30), C);
+  const filas = bloquesDelPlan(p15, p4, p30, C);
+  assert.equal(filas.length, 80);
+  assert.ok(filas.every(g => g.completo && g.n === 24 && g.iL === 0 && g.iH === 23));
+  assert.deepEqual(filas.slice(0, 5).map(g => g.k), [0, 1, 2, 3, 0]);
+  assert.equal(filas[0].macro, 0);              // al empezar no hay velas cerradas de 4 h
+  assert.equal(filas[79].macro, 1);
+  assert.equal(filas[79].micro, 1);
+  cerca(filas[1].o, 100 + 24 * 0.05);
+  const ahora = v15.at(-1).fin + 1 + 30 * MIN;  // media hora dentro del bloque siguiente, sin velas de 15 m cerradas
+  const plan = planDelDia(p15, p4, p30, v15.at(-1).c, C, ahora);
+  assert.equal(plan.bloques.length, 4);
+  assert.deepEqual(plan.bloques.map(b => b.estado), ['en curso', 'por venir', 'por venir', 'por venir']);
+  assert.equal(plan.bloques[0].direccion, 1);
+  assert.equal(plan.bloques[0].horas, '18:00–00:00');
+  assert.equal(plan.registro.length, 80);
+  assert.equal(plan.registro[0].t, filas[79].t);
+  assert.ok(plan.cuenta.n > 20 && plan.cuenta.aciertos === plan.cuenta.n);
+  assert.equal(plan.registro[0].primero, 'abajo');
+});
+
+// Francotirador con disparo en 5 m: respeta sus propios límites de stop y cuenta el vencimiento en velas de 5 m.
+prueba(() => {
+  let semilla = 777;
+  const azar = () => { semilla = (semilla * 1664525 + 1013904223) % 4294967296; return semilla / 4294967296; };
+  const t0 = Date.UTC(2026, 0, 5);
+  const v5 = [];
+  let precio = 100;
+  for (let i = 0; i < 60000; i++) {
+    const o = precio;
+    precio = Math.max(1, precio * (1 + (azar() - 0.505) * 0.007 + Math.sin(i / 400) * 0.0004));
+    const c = precio;
+    v5.push({ t: t0 + i * 5 * MIN, o, c, h: Math.max(o, c) * (1 + azar() * 0.001), l: Math.min(o, c) * (1 - azar() * 0.001), v: 100, tb: 100 * azar(), fin: t0 + (i + 1) * 5 * MIN - 1 });
+  }
+  const TM = P.tiradorMicro;
+  const { ops } = simularTirador(preparar(v5, C), preparar(agrupar(v5, 5, 30), C), '30m', P, { gatillo: TM.gatillo, ajustes: { stopMinimoPct: TM.stopMinimoPct, stopMaximoPct: TM.stopMaximoPct } });
+  const cerradas = ops.filter(o => o.estado === 'cerrada');
+  assert.ok(cerradas.length >= 20, `solo ${cerradas.length} operaciones`);
+  for (const o of cerradas) {
+    assert.equal(o.gatilloMarco, '5m');
+    assert.equal(o.vence, Math.round(R.vencimientoVelas * 30 / 5));
+    assert.ok(o.riesgoPct >= TM.stopMinimoPct - 1e-9 && o.riesgoPct <= TM.stopMaximoPct + 1e-9, `stop a ${o.riesgoPct} %`);
+    assert.ok(o.velas <= o.vence);
   }
 });
 

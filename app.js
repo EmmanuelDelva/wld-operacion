@@ -14,7 +14,7 @@ let reloj = null;
 let auto = leerGuardado('auto', false);
 let temporizador = null;
 const ancho = () => window.innerWidth >= 1100;
-const abiertos = new Set(leerGuardado('abiertos', ancho() ? ['mercado', 'fase', 'mapa', 'boleta'] : []));
+const abiertos = new Set(leerGuardado('abiertos', ancho() ? ['mercado', 'fase', 'boleta'] : []));
 const idea = leerGuardado('idea', { lado: -1, precio: '' });
 const opiniones = leerGuardado('opiniones', {});
 const vistas = new Set(leerGuardado('vistas', []));
@@ -22,7 +22,7 @@ let pegando = null;
 let todo = leerGuardado('todo', false);   // mostrar también las reglas sin ventaja medida
 
 const NOMBRE = { '1w': '1 S', '1d': '1 D', '4h': '4 h', '3h': '3 h', '2h': '2 h', '1h': '1 h', '45m': '45 m', '30m': '30 m', '15m': '15 m', '5m': '5 m', '3m': '3 m', '1m': '1 m' };
-const REGLA = { tirador: 'Francotirador, disparo en 15 m', zona: 'Retroceso, entrada en zona', retroceso: 'Retroceso, con confirmación', barrido: 'Ruptura fallida' };
+const REGLA = { tirador: 'Francotirador', zona: 'Retroceso, entrada en zona', retroceso: 'Retroceso, con confirmación', barrido: 'Ruptura fallida' };
 const CORTA = { tirador: 'Francotirador', zona: 'Zona', retroceso: 'Confirmación', barrido: 'Ruptura fallida' };
 const LADO = l => (l < 0 ? 'Corto' : 'Largo');
 const color = l => (l < 0 ? 'rojo' : 'verde');
@@ -33,6 +33,8 @@ const pct = (x, d = 2) => (x == null ? '—' : (x > 0 ? '+' : x < 0 ? '−' : ''
 const hora = t => new Date(t).toLocaleString('es-MX', { timeZone: 'America/Mexico_City', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false });
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const sesgoTxt = d => (d > 0 ? 'alcista' : d < 0 ? 'bajista' : 'lateral');
+const durar = ms => { const m = Math.max(0, Math.round(ms / 60000)); return m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m} min`; };
+const dia = t => new Date(t).toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', day: 'numeric', month: 'short' });
 
 // ---------- Evidencia ----------
 
@@ -50,6 +52,49 @@ function evidencia(regla, marco, lado) {
 const PESO = { 'ventaja medida': 3, 'a favor, por confirmar': 2, 'muestra baja': 1, 'sin ventaja': 0 };
 const pesoEvidencia = (regla, marco, lado) => PESO[evidencia(regla, marco, lado).etiqueta] ?? 1;
 const sinVentaja = o => evidencia(o.regla, o.marco, o.lado).etiqueta === 'sin ventaja';
+
+// Qué tan sólida es una opción. Manda lo que dice la historia de su celda; el número de condiciones solo
+// pesa donde cumplir más sí dejó mejor resultado.
+function lectura(p, lado, f) {
+  const ev = evidencia(p.regla, p.marco, lado);
+  const celda = EV && EV.celdas[`${p.regla}|${p.marco}|${lado < 0 ? 'corto' : 'largo'}`];
+  let cond = f && f.de ? `Cumple ${f.aFavor} de ${f.de} condiciones` : 'No hay condiciones que medir';
+  let pesan = null;
+  if (f && f.de && celda && celda.conTresOMas && celda.conMenos && celda.conTresOMas.n >= 30 && celda.conMenos.n >= 30) {
+    pesan = celda.conTresOMas.neto > celda.conMenos.neto + 0.05;
+    cond += pesan ? '; en esta regla, cumplir más sí dejó mejor resultado.' : '; en esta regla, cumplir más no dejó mejor resultado, así que ese número no la hace mejor ni peor.';
+  } else cond += '.';
+  const pocas = pesan && f.aFavor < 3;
+  if (ev.etiqueta === 'sin ventaja') return { clase: 'rojo', texto: `Sin respaldo: esta regla pierde en la historia de ${NOMBRE[p.marco]}. ${cond}` };
+  if (ev.etiqueta === 'ventaja medida') return { clase: pocas ? 'ambar' : 'verde', texto: `Con ventaja medida. ${cond}` };
+  if (ev.etiqueta === 'a favor, por confirmar') return { clase: 'ambar', texto: `${pocas ? 'Floja' : 'A favor en la historia, sin confirmar'}. ${cond}` };
+  return { clase: 'gris', texto: `Sin casos suficientes para medirla. ${cond}` };
+}
+
+function condiciones(p, f) {
+  if (!f) return '';
+  const nombre = x => (x === 'Temporalidad superior alineada' ? `${NOMBRE[P.superior[p.marco]]} alineado` : x);
+  return f.lista.map(x => `<span class="${x[1] == null ? 'mut' : x[1] ? 'verde' : 'rojo'}" style="white-space:nowrap">${x[1] == null ? '·' : x[1] ? '✓' : '✗'} ${nombre(x[0])}</span>`).join(' &nbsp; ');
+}
+
+// El francotirador de una temporalidad, en una frase.
+function resumenTirador(marco, direccion) {
+  const x = marco && E.porMarco[marco] ? E.porMarco[marco].tirador : null;
+  if (!x) return 'no aplica en esta temporalidad';
+  const tf = NOMBRE[marco];
+  if (x.estado === 'sin operación') return `sin zona: las medias de ${tf} no están lo bastante separadas para apuntar`;
+  const lado = x.op ? x.op.lado : x.lado;
+  const g = NOMBRE[(x.op ? x.op.gatilloMarco : x.gatilloMarco) || '15m'];
+  const ev = evidencia('tirador', marco, lado);
+  const contra = direccion && lado !== direccion ? ' Va contra lo que manda.' : '';
+  const cola = ` <span class="${ev.clase}">${ev.etiqueta ? ev.etiqueta[0].toUpperCase() + ev.etiqueta.slice(1) : ev.texto}.</span>${contra}`;
+  if (x.estado === 'en operación') {
+    const o = x.op;
+    return `<b class="${color(lado)}">${LADO(lado)} en operación</b> desde <span class="num">${n(o.entrada)}</span> (${hora(o.t)}): stop <span class="num">${n(o.stop)}</span>, objetivo <span class="num">${n(o.objetivo2)}</span>, va en ${R(lado * (E.precio - o.entrada) / o.riesgo)}.${cola}`;
+  }
+  if (x.estado === 'apuntando') return `<b class="${color(lado)}">${LADO(lado)} apuntando</b>: dispara con una vela de ${g} que cierre ${lado < 0 ? 'bajo' : 'sobre'} <span class="num">${n(x.gatillo)}</span>; se invalida en <span class="num">${n(x.invalida)}</span>.${cola}`;
+  return `<b class="${color(lado)}">${LADO(lado)} en preparación</b>: zona entre <span class="num">${n(x.desde)}</span> y <span class="num">${n(x.hasta)}</span>${x.armada === false ? ', por la que el precio ya pasó sin dar entrada' : ''}; se invalida en <span class="num">${n(x.invalida)}</span>.${cola}`;
+}
 
 // ---------- Piezas ----------
 
@@ -105,6 +150,7 @@ function bloqueManda() {
     <div class="estado ${c}">${titulo}</div>
     <div style="padding:4px 0 8px">${recorrido}</div>
     <div class="kv"><span>Fondo</span><span>${fondo}</span></div>
+    <div class="kv"><span>Francotirador en lo que manda</span><span>${m.manda ? resumenTirador(m.manda, m.direccion) : 'sin impulso que seguir'}</span></div>
     <div class="kv"><span>A vigilar</span><span>${vigilar}</span></div>
     ${datosRapidos()}</div>`;
 }
@@ -118,7 +164,10 @@ function tarjetaOpcion(titulo, p) {
   const f = op ? op.factores : p.factores;
   const ev = evidencia(p.regla, p.marco, lado);
   const m = E.mando;
-  const fondo = m.direccionFondo === 0 ? '' : lado === m.direccionFondo ? '<span class="chip verde">a favor del fondo</span>' : '<span class="chip ambar">contra el fondo</span>';
+  const fondo = m.direccionFondo === 0 ? '' : lado === m.direccionFondo ? `<span class="chip verde">mismo lado que ${NOMBRE[m.fondo]}</span>` : `<span class="chip ambar">contra ${NOMBRE[m.fondo]}</span>`;
+  const G = NOMBRE[(op ? op.gatilloMarco : p.gatilloMarco) || '15m'];
+  const lim = p.limites || [P.tirador.stopMinimoPct, P.tirador.stopMaximoPct];
+  const lec = lectura(p, lado, f);
   let palabra;
   let frase;
   let partes;
@@ -126,7 +175,7 @@ function tarjetaOpcion(titulo, p) {
   if (op) {
     const avance = lado * (E.precio - op.entrada) / op.riesgo;
     palabra = p.estado === 'reciente' ? 'Entrada confirmada' : 'En operación';
-    frase = `${LADO(lado)} de ${tf} · ${CORTA[p.regla]} · desde ${hora(op.t)} · va en ${R(avance)}`;
+    frase = `${LADO(lado)} de ${tf} · ${CORTA[p.regla]}${p.regla === 'tirador' ? `, disparo en ${G}` : ''} · desde ${hora(op.t)} · va en ${R(avance)}`;
     partes = [
       { p: op.stop, t: 'Stop', v: n(op.stop), s: `a ${op.riesgoPct.toFixed(2)} %`, c: 'inv', k: 'rojo' },
       { p: op.entrada, t: 'Entrada', v: n(op.entrada), s: `ahora ${n(E.precio)}`, c: 'zona', k: 'ambar' },
@@ -148,9 +197,9 @@ function tarjetaOpcion(titulo, p) {
       { p: p.ideal, t: 'Abre entre', v: `${n(p.desde)} y ${n(p.hasta)}`, s: `ahora ${n(E.precio)}`, c: 'zona', k: 'ambar' },
       { p: p.objetivo2, t: 'Terminaría cerca de', v: n(p.objetivo2), s: '' },
     ];
-    if (p.regla === 'tirador' && p.estado === 'apuntando') nota = `Disparo: una vela de 15 m que cierre ${lado < 0 ? 'bajo' : 'sobre'} <span class="num">${n(p.gatillo)}</span>, cerca de su extremo. El stop queda detrás del ${lado < 0 ? 'máximo' : 'mínimo'} de las últimas velas de 15 m, entre ${P.tirador.stopMinimoPct} % y ${P.tirador.stopMaximoPct} %.`;
-    else if (p.regla === 'tirador' && p.armada === false) nota = `El precio ya pasó por esta zona sin dar entrada. Se vuelve a armar cuando una vela de 15 m cierre ${lado < 0 ? 'bajo' : 'sobre'} <span class="num">${n(lado < 0 ? p.desde : p.hasta)}</span> y el precio regrese a la zona.`;
-    else if (p.regla === 'tirador') nota = `Cuando el precio entre a la zona, el disparo será una vela de 15 m que cierre ${lado < 0 ? 'bajo el mínimo' : 'sobre el máximo'} de las tres anteriores. Stop entre ${P.tirador.stopMinimoPct} % y ${P.tirador.stopMaximoPct} %.`;
+    if (p.regla === 'tirador' && p.estado === 'apuntando') nota = `Disparo: una vela de ${G} que cierre ${lado < 0 ? 'bajo' : 'sobre'} <span class="num">${n(p.gatillo)}</span>, cerca de su extremo. El stop queda detrás del ${lado < 0 ? 'máximo' : 'mínimo'} de las últimas velas de ${G}, entre ${lim[0]} % y ${lim[1]} %.`;
+    else if (p.regla === 'tirador' && p.armada === false) nota = `El precio ya pasó por esta zona sin dar entrada. Se vuelve a armar cuando una vela de ${G} cierre ${lado < 0 ? 'bajo' : 'sobre'} <span class="num">${n(lado < 0 ? p.desde : p.hasta)}</span> y el precio regrese a la zona.`;
+    else if (p.regla === 'tirador') nota = `Cuando el precio entre a la zona, el disparo será una vela de ${G} que cierre ${lado < 0 ? 'bajo el mínimo' : 'sobre el máximo'} de las tres anteriores. Stop entre ${lim[0]} % y ${lim[1]} %.`;
     else if (p.gatillo != null) nota = `Confirma con una vela de ${tf} que cierre ${lado < 0 ? 'bajo' : 'sobre'} <span class="num">${n(p.gatillo)}</span>.`;
   }
   const celda = EV && EV.celdas[`${p.regla}|${p.marco}|${lado < 0 ? 'corto' : 'largo'}`];
@@ -166,13 +215,17 @@ function tarjetaOpcion(titulo, p) {
     }
     alta = `<div class="lab" style="padding-top:4px">Salida corta (stop en la invalidación del macro, objetivo a un tercio de esa distancia): acertó ${ae.historia.aciertos} % en ${ae.historia.n} casos, con ${pct(ae.historia.netoPct)} neto por operación${ae.limpio.n ? `; desde ${EV.corte}, ${ae.limpio.aciertos} % en ${ae.limpio.n} casos, con ${pct(ae.limpio.netoPct)}` : ''}. Una pérdida borra unas cuatro ganancias.${niveles}</div>`;
   }
+  const separan = celda && celda.conTresOMas && celda.conMenos && celda.conTresOMas.n >= 20 && celda.conMenos.n >= 20
+    ? `<div class="lab" style="padding-top:4px">En la historia de esta regla, con 3 o más condiciones dejó ${R(celda.conTresOMas.neto)} en ${celda.conTresOMas.n} casos; con menos, ${R(celda.conMenos.neto)} en ${celda.conMenos.n}.</div>` : '';
   return `<div class="p">
-    <div class="fila"><div class="lab">${titulo}</div>${fondo}<span class="chip">a favor ${f ? `${f.aFavor} de ${f.de}` : '—'}</span></div>
+    <div class="fila"><div class="lab">${titulo}</div>${fondo}<span class="chip">condiciones ${f ? `${f.aFavor} de ${f.de}` : '—'}</span></div>
     <div class="estado" style="font-size:22px">${palabra}</div>
-    <div class="${color(lado)}" style="padding:2px 0 8px">${frase}</div>
+    <div class="${color(lado)}" style="padding:2px 0 6px">${frase}</div>
+    <div class="${lec.clase}" style="padding-bottom:8px">${lec.texto}</div>
     ${escalera(partes)}
     ${nota ? `<div class="lab" style="padding-top:6px">${nota}</div>` : ''}
-    <div class="lab ${ev.clase}" style="padding-top:6px">Evidencia en ${tf}: ${ev.texto}</div>${rec}${alta}</div>`;
+    <div style="padding-top:6px;font-size:12px;line-height:1.7">${condiciones(p, f)}</div>
+    <div class="lab ${ev.clase}" style="padding-top:6px">Evidencia en ${tf}: ${ev.texto}</div>${separan}${rec}${alta}</div>`;
 }
 
 // Macro y micro: alineados o no, y dónde salir si se va contra el macro.
@@ -276,17 +329,106 @@ function secFase() {
   return seccion('fase', 'Fase y BTC', `${fase}${b ? ` · BTC ${b.marcos['4h'].sesgo} en 4 h` : ''}`, cuerpoFase + cuerpoBtc);
 }
 
-function secMapa() {
+// ---------- Mapa del día: plan por horario ----------
+
+// Lo medido para un bloque: su horario con el contexto de 4 h y 30 m si se ha dado bastantes veces; si no,
+// el horario solo. La inclinación cuenta únicamente si queda sobre 50 % aun restándole su margen de error.
+function basePlan(b) {
+  const pl = EV && EV.plan;
+  if (!pl) return null;
+  const hor = pl.horas ? pl.horas[b.k] : null;
+  const ctx = pl.celdas[`${b.k}|${b.macro}|${b.micro}`];
+  const conContexto = !!ctx && ctx.n >= P.plan.casosMinimos;
+  const c = conContexto ? ctx : hor;
+  if (!c) return null;
+  // WLD ha bajado en más de la mitad de todos los bloques: para contar como inclinación bajista tiene que superar eso.
+  const general = pl.base || { baja: 50, sube: 50 };
+  const lado = c.baja > c.sube ? -1 : 1;
+  const q = Math.max(c.sube, c.baja) / 100;
+  const referencia = Math.max(50, lado < 0 ? general.baja : general.sube) / 100;
+  const inclina = q - 1.96 * Math.sqrt(q * (1 - q) / c.n) > referencia ? lado : 0;
+  return { ...c, conContexto, casosContexto: ctx ? ctx.n : 0, hor, inclina, general };
+}
+
+function tituloPlan(c) {
+  if (!c) return 'Sin medición cargada';
+  if (c.inclina < 0) return `Inclinación bajista${c.baja < 60 ? ' leve' : ''}: bajó el ${c.baja} % de ${c.n} veces`;
+  if (c.inclina > 0) return `Inclinación alcista${c.sube < 60 ? ' leve' : ''}: subió el ${c.sube} % de ${c.n} veces`;
+  return `Sin lado medido: subió el ${c.sube} % y bajó el ${c.baja} % de ${c.n} veces`;
+}
+
+// La ruta posible: hasta dónde suele llegar arriba y abajo desde la apertura del bloque, y qué extremo hace primero.
+function rutaPlan(b, c) {
+  if (!c) return '<span class="mut">Falta la medición de este horario.</span>';
+  const orden = c.primeroArriba >= 55 ? ` Suele hacer primero el máximo (${c.primeroArriba} %).` : c.primeroAbajo >= 55 ? ` Suele hacer primero el mínimo (${c.primeroAbajo} %).` : ' Sin orden claro entre máximo y mínimo.';
+  if (b.estado !== 'en curso') return `Arriba: típico ${pct(c.arriba.med, 1)}, amplio ${pct(c.arriba.p80, 1)}. Abajo: típico ${pct(-c.abajo.med, 1)}, amplio ${pct(-c.abajo.p80, 1)}, desde donde abra.${orden}`;
+  const px = x => {
+    const nivel = b.apertura * (1 + x / 100);
+    return `<span class="num">${n(nivel)}</span>${(x > 0 ? b.maximo >= nivel : b.minimo <= nivel) ? ' (ya lo tocó)' : ''}`;
+  };
+  return `Arriba: típico ${px(c.arriba.med)}, amplio ${px(c.arriba.p80)}. Abajo: típico ${px(-c.abajo.med)}, amplio ${px(-c.abajo.p80)}.${orden}`;
+}
+
+// Cómo se cruza el bloque con el francotirador macro y micro: qué hay, si el horario suele llegar ahí y qué respaldo tiene.
+function comoOperar(b, c) {
+  const partes = [];
+  for (const [nombre, p] of [['Macro', E.macro], ['Micro', E.micro]]) {
+    if (!p) { partes.push(`<b>${nombre}</b>: sin francotirador vigente.`); continue; }
+    const l = p.op ? p.op.lado : p.lado;
+    const lado = LADO(l).toLowerCase();
+    const et = evidencia(p.regla, p.marco, l).etiqueta;
+    const respaldo = et === 'sin ventaja' ? ' <span class="rojo">Esta regla pierde en la historia.</span>' : et === 'a favor, por confirmar' ? ' <span class="ambar">A favor en la historia, sin confirmar.</span>' : et === 'ventaja medida' ? ' <span class="verde">Con ventaja medida.</span>' : ' Sin casos para medirla.';
+    const cabeza = `<b>${nombre} (${NOMBRE[p.marco]})</b>`;
+    if (p.op) { partes.push(`${cabeza}: ${lado} abierto desde <span class="num">${n(p.op.entrada)}</span>, stop <span class="num">${n(p.op.stop)}</span>, objetivo <span class="num">${n(p.op.objetivo2)}</span>.${respaldo}`); continue; }
+    if (p.estado === 'apuntando') { partes.push(`${cabeza}: ${lado} apuntando; dispara con una vela de ${NOMBRE[p.gatilloMarco || '15m']} que cierre ${l < 0 ? 'bajo' : 'sobre'} <span class="num">${n(p.gatillo)}</span>.${respaldo}`); continue; }
+    let alcance = '';
+    if (c) {
+      const borde = l < 0 ? p.desde : p.hasta;
+      const llega = x => (l < 0 ? borde <= x : borde >= x);
+      const tipico = b.apertura * (1 + (l < 0 ? c.arriba.med : -c.abajo.med) / 100);
+      const amplio = b.apertura * (1 + (l < 0 ? c.arriba.p80 : -c.abajo.p80) / 100);
+      alcance = llega(tipico) ? ', dentro de lo que este horario suele recorrer' : llega(amplio) ? ', que solo alcanza un recorrido amplio' : ', más lejos de lo que este horario suele recorrer';
+    }
+    partes.push(`${cabeza}: espera el ${lado} entre <span class="num">${n(p.desde)}</span> y <span class="num">${n(p.hasta)}</span>${alcance}.${respaldo}`);
+  }
+  return partes.join('<br>');
+}
+
+function tilePlan(b) {
+  const c = basePlan(b);
+  const cur = b.estado === 'en curso';
+  const col = !c || c.inclina === 0 ? '' : c.inclina > 0 ? 'verde' : 'rojo';
+  const contexto = `4 h ${sesgoTxt(b.macro)} y 30 m ${sesgoTxt(b.micro)}`;
+  let base = '';
+  if (c) {
+    base = c.conContexto
+      ? `Medido en este horario con ${contexto}.${c.hor ? ` El horario solo, con cualquier contexto: bajó el ${c.hor.baja} % de ${c.hor.n}.` : ''}`
+      : `Medido en este horario con cualquier contexto: el de ${cur ? 'este bloque' : 'ahora'} (${contexto}) se ha dado ${c.casosContexto} veces, pocas para medirlo aparte.`;
+    if (c.inclina < 0) base += ` WLD bajó en el ${c.general.baja} % de todos los bloques.`;
+    if (c.inclina !== 0 && !c.conContexto && c.porAnio) base += ` Por año: ${Object.entries(c.porAnio).map(([a, y]) => `${a}, ${c.inclina < 0 ? y.baja : y.sube} %`).join('; ')}.`;
+  }
+  return `<div class="tile" ${cur ? 'style="border:1px solid #5A4718"' : ''}>
+    <div class="fila"><b class="num">${b.horas}</b><span class="lab">${cur ? `en curso · quedan ${durar(b.restante)}` : `empieza en ${durar(b.falta)}`}</span></div>
+    <div class="${col}" style="font-weight:600;padding:3px 0 1px">${tituloPlan(c)}</div>
+    <div class="lab">${cur ? `Al empezar: ${contexto}.` : `Si sigue como ahora: ${contexto}.`} ${base}</div>
+    ${cur ? `<div class="lab" style="padding-top:3px">Va <span class="num ${b.cambio >= 0 ? 'verde' : 'rojo'}">${pct(b.cambio, 1)}</span> desde <span class="num">${n(b.apertura)}</span> · máx. <span class="num">${n(b.maximo)}</span> · mín. <span class="num">${n(b.minimo)}</span></div>` : ''}
+    <div style="padding-top:5px"><span class="lab">Ruta · </span>${rutaPlan(b, c)}</div>
+    ${cur ? `<div style="padding-top:5px"><div class="lab">Cómo se opera</div>${comoOperar(b, c)}</div>` : ''}</div>`;
+}
+
+function panelPlan() {
+  const pl = E.plan;
   const m = E.mapa;
-  const bloques = m.bloques.map(b => {
-    const s = b.sesgo === 'sin sesgo' ? 'sin sesgo' : `${b.sesgo} ${b.frecuencia} % de ${b.dias} días`;
-    const cambio = b.cambio == null ? '' : `<span class="${b.cambio >= 0 ? 'verde' : 'rojo'} num">${pct(b.cambio, 1)}</span>`;
-    return `<div class="tile" ${b.estado === 'en curso' ? 'style="border:1px solid #5A4718"' : ''}><div class="lab">${b.horas}</div><div>${b.estado === 'por venir' ? '<span class="mut">por venir</span>' : cambio || '<span class="mut">empieza</span>'}</div><div class="lab">${b.estado === 'cerrado' ? 'cerrado' : s}</div></div>`;
-  }).join('');
-  return seccion('mapa', 'Mapa del día', `Techo ${n(m.techo)} · piso ${n(m.piso)}`, `<div class="lab" style="padding-bottom:6px">Hora de Guadalajara. El día empieza a las 18:00.</div>
-    <div class="cuatro"><div class="tile"><div class="lab">Apertura</div><div class="num">${n(m.apertura)}</div></div><div class="tile"><div class="lab">Máx. y mín.</div><div class="num">${n(m.maximo)} · ${n(m.minimo)}</div></div><div class="tile"><div class="lab">Techo probable</div><div class="num">${n(m.techo)}</div></div><div class="tile"><div class="lab">Piso probable</div><div class="num">${n(m.piso)}</div></div></div>
-    <div class="cuatro" style="padding-top:6px">${bloques}</div>
-    <div class="lab" style="padding-top:8px">Techo y piso: solo 2 de cada 10 días pasados los rebasaron. Un bloque lleva sesgo únicamente si se repitió ${P.mapaDelDia.frecuenciaSesgo} % de las veces o más.</div>`);
+  const filas = pl.registro.slice(0, 12).map(r => `<div class="sen"><div><span class="num">${dia(r.t)} · ${r.horas}</span>${r.acerto == null ? '' : r.acerto ? ' · siguió la dirección que traía' : ' · fue contra la dirección que traía'}</div><div class="r num ${r.cambio >= 0 ? 'verde' : 'rojo'}">${pct(r.cambio, 1)}</div>
+    <div class="lab">Empezó con 4 h ${sesgoTxt(r.macro)} y 30 m ${sesgoTxt(r.micro)} · subió hasta ${pct(r.arriba, 1)} y bajó hasta ${pct(-r.abajo, 1)} · primero hizo el ${r.primero === 'arriba' ? 'máximo' : r.primero === 'abajo' ? 'mínimo' : 'máximo y el mínimo a la vez'}</div><div></div></div>`).join('');
+  const h = EV && EV.plan ? EV.plan.resumen['con dirección'] : null;
+  const dias = Math.round(pl.registro.length / 4);
+  return `<div class="p"><div class="fila"><div class="h">Mapa del día: plan por horario</div><div class="lab" style="margin-left:auto">Hora de Guadalajara · bloques de 6 horas</div></div>
+    <div class="plan" style="padding-top:8px">${pl.bloques.map(tilePlan).join('')}</div>
+    <div class="cuatro" style="padding-top:6px"><div class="tile"><div class="lab">Apertura del día (18:00)</div><div class="num">${n(m.apertura)}</div></div><div class="tile"><div class="lab">Máx. y mín. del día</div><div class="num">${n(m.maximo)} · ${n(m.minimo)}</div></div><div class="tile"><div class="lab">Techo probable</div><div class="num">${n(m.techo)}</div></div><div class="tile"><div class="lab">Piso probable</div><div class="num">${n(m.piso)}</div></div></div>
+    <div class="lab" style="padding:6px 0 2px">«Típico» es lo que recorrió la mitad de los bloques iguales; «amplio», lo que solo 2 de cada 10 rebasaron. Lo mismo con el techo y el piso del día. Es lo que ha hecho este horario en toda la historia de WLD, no un pronóstico.</div>
+    ${seccion('registro', 'Registro de bloques', pl.cuenta.n ? `siguió la dirección que traía en ${pl.cuenta.aciertos} de ${pl.cuenta.n} · ${dias} días` : 'sin bloques cerrados', `${filas || '<div class="mut">Todavía no hay bloques cerrados.</div>'}
+      ${h && h.historia.n ? `<div class="lab" style="padding-top:8px">En toda la historia, el bloque cerró hacia donde apuntaban 4 h y 30 m al empezar el ${h.historia.aFavor} % de ${h.historia.n} veces${h.limpio.n ? ` (desde ${EV.corte}: ${h.limpio.aFavor} % de ${h.limpio.n})` : ''}: la tendencia que trae no dice hacia dónde cierra el bloque. El registro completo está en Drive, en «Registro del mapa del día».</div>` : ''}`)}</div>`;
 }
 
 function secBoleta() {
@@ -332,7 +474,7 @@ function porTemporalidad() {
       if (regla === 'tirador' && s.estado === 'apuntando') {
         const ev = evidencia('tirador', marco, s.lado);
         items.push(`<div class="l1"><span class="chip ambar">${LADO(s.lado)} apuntando</span><span class="num">zona entre ${n(s.desde)} y ${n(s.hasta)}</span></div>
-          <div class="l2">Francotirador · dispara si una vela de 15 m cierra ${s.lado < 0 ? 'bajo' : 'sobre'} ${n(s.gatillo)} · se invalida en ${n(s.invalida)}<br><span class="${ev.clase}">${ev.texto}</span></div>`);
+          <div class="l2">Francotirador · dispara si una vela de ${NOMBRE[s.gatilloMarco || '15m']} cierra ${s.lado < 0 ? 'bajo' : 'sobre'} ${n(s.gatillo)} · se invalida en ${n(s.invalida)}<br><span class="${ev.clase}">${ev.texto}</span></div>`);
         continue;
       }
       if (s.estado === 'en operación') {
@@ -368,7 +510,7 @@ function senales() {
 }
 
 function pie() {
-  return `<div class="lab" style="text-align:center;padding-top:4px">Reglas versión ${P.version}${EV ? ` · evidencia medida el ${EV.hecho.slice(0, 10)} con historia desde ${EV.desde}` : ' · sin evidencia cargada'} · No es asesoría financiera: la app no opera ni guarda llaves.</div>`;
+  return `<div class="lab" style="text-align:center;padding-top:4px">Reglas versión ${P.version}${EV ? ` · evidencia medida el ${hora(Date.parse(EV.hecho))}, hora de Guadalajara, con historia desde ${EV.desde}` : ' · sin evidencia cargada'} · No es asesoría financiera: la app no opera ni guarda llaves.</div>`;
 }
 
 // ---------- Pintar ----------
@@ -384,7 +526,8 @@ function pintar() {
     + (falla ? `<div class="p aviso">No se pudo actualizar: ${esc(falla)}. Lo que ves es el último dato bueno.</div>` : '')
     + bloqueManda()
     + `<div class="cols">${tarjetaOpcion('Opción macro · 1 h a 1 D', E.macro)}${tarjetaOpcion('Opción micro · 15 y 30 m', E.micro)}<div style="display:flex;flex-direction:column;gap:10px">${alineacion()}${tarjetaIdea()}</div></div>`
-    + `<div class="cols"><div class="p" style="padding-top:0;padding-bottom:0">${secMercado()}${secFase()}</div><div class="p" style="padding-top:0;padding-bottom:0">${secMapa()}${secBoleta()}</div>${tarjetaOpiniones()}</div>`
+    + panelPlan()
+    + `<div class="cols"><div class="p" style="padding-top:0;padding-bottom:0">${secMercado()}${secFase()}</div><div class="p" style="padding-top:0;padding-bottom:0">${secBoleta()}</div>${tarjetaOpiniones()}</div>`
     + `<div class="cols">${porTemporalidad()}${senales()}</div>`
     + pie();
   edad();
@@ -409,6 +552,9 @@ function textoParaIA() {
   if (E.micro && E.macro && E.micro !== E.principal) { const b = E.micro; const lb = b.op ? b.op.lado : b.lado; L.push(`Opción micro: ${LADO(lb)} de ${NOMBRE[b.marco]}, ${b.estado}.`); }
   if (E.btc) L.push(`BTC: ${['1d', '4h', '1h'].map(k => `${NOMBRE[k]} ${E.btc.marcos[k].sesgo}`).join(', ')}. WLD frente a BTC en 24 h: ${pct(E.btc.diferencia)}.`);
   L.push(`Mapa del día: apertura ${n(E.mapa.apertura)}, máximo ${n(E.mapa.maximo)}, mínimo ${n(E.mapa.minimo)}, techo probable ${n(E.mapa.techo)}, piso probable ${n(E.mapa.piso)}.`);
+  const b0 = E.plan.bloques[0];
+  const c0 = basePlan(b0);
+  L.push(`Bloque ${b0.horas} (hora de Guadalajara): abrió en ${n(b0.apertura)} y va ${pct(b0.cambio, 1)}. Historia de este horario: ${tituloPlan(c0).toLowerCase()}.`);
   if (p) {
     const lado = p.op ? p.op.lado : p.lado;
     const f = p.op ? p.op.factores : p.factores;
@@ -453,7 +599,7 @@ async function actualizar() {
     if (!EV) { try { const r = await fetch('reglas/evidencia.json', { cache: 'no-store' }); if (r.ok) EV = await r.json(); } catch { /* sin evidencia */ } }
     E = await leerEstado({ parametros: P });
     E.macro = elegirPrincipal(E.porMarco, P.tirador.marcos, E.hora, E.mando, pesoEvidencia, { reglas: ['tirador'], precio: E.precio });
-    E.micro = elegirPrincipal(E.porMarco, ['15m', '30m'], E.hora, E.mando, pesoEvidencia, { reglas: ['retroceso', 'barrido'], precio: E.precio });
+    E.micro = elegirPrincipal(E.porMarco, ['15m', '30m'], E.hora, E.mando, pesoEvidencia, { reglas: ['tirador'], precio: E.precio });
     E.principal = E.macro || E.micro;
     falla = null;
   } catch (e) {

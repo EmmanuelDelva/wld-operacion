@@ -4,7 +4,7 @@
 // Hay que correrlo en tu propia máquina: a los servidores en Estados Unidos Binance les responde 451.
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { BINANCE, armarTodas, preparar, simular, simularTirador, resumir } from '../motor/motor.js';
+import { BINANCE, armarTodas, preparar, simular, simularTirador, resumir, bloquesDelPlan, cuantil } from '../motor/motor.js';
 
 const raiz = new URL('../', import.meta.url);
 const textoParametros = await readFile(new URL('reglas/parametros.json', raiz), 'utf8');
@@ -40,7 +40,7 @@ async function historia(simbolo, marco, inicio = 0) {
 
 console.log('Bajando historia…');
 const w = {};
-for (const m of ['1w', '1d', '4h', '1h', '15m']) w[m] = await historia('WLDUSDT', m);
+for (const m of ['1w', '1d', '4h', '1h', '15m', '5m']) w[m] = await historia('WLDUSDT', m);
 const inicioBtc = w['1d'][0].t - 90 * 86_400_000;
 const b = {};
 for (const m of ['1d', '4h', '1h', '15m']) b[m] = await historia('BTCUSDT', m, inicioBtc);
@@ -88,6 +88,8 @@ const btc = armarTodas(b);
 const prep = {};
 const prepBtc = {};
 for (const m of [...P.operables, '1w']) prep[m] = preparar(series[m], P.contexto);
+const TM = P.tiradorMicro;
+prep[TM.gatillo] = preparar(series[TM.gatillo], P.contexto);
 for (const m of P.operables) prepBtc[m] = preparar(btc[m], P.contexto);
 
 const corte = Date.parse(E.corte);
@@ -106,10 +108,14 @@ const etiquetar = (h, piso, estres, limpio) => {
   if (h.n >= E.muestraEvaluable && piso > 0 && estres > 0 && (limpio.n < 10 || limpio.neto > -0.05)) return 'ventaja medida';
   return h.neto > 0 ? 'a favor, por confirmar' : 'sin ventaja';
 };
-// Francotirador: idea en el macro, disparo en 15 m.
+// Francotirador: idea de 1 h a 1 D con disparo en 15 m, e idea de 15 a 45 m con disparo en 5 m.
 const opsTirador = {};
-for (const m of P.tirador.marcos) {
-  const { ops } = simularTirador(prep['15m'], prep[m], m, P, { superior: prep[P.superior[m]], btc: prepBtc[m] });
+const tandas = [
+  ...P.tirador.marcos.map(m => [m, prep['15m'], {}]),
+  ...TM.marcos.map(m => [m, prep[TM.gatillo], { gatillo: TM.gatillo, ajustes: { stopMinimoPct: TM.stopMinimoPct, stopMaximoPct: TM.stopMaximoPct } }]),
+];
+for (const [m, pG, extra] of tandas) {
+  const { ops } = simularTirador(pG, prep[m], m, P, { superior: prep[P.superior[m]], btc: prepBtc[m], ...extra });
   conFunding(ops);
   opsTirador[m] = ops;
   for (const lado of [-1, 1]) {
@@ -129,6 +135,7 @@ for (const m of P.tirador.marcos) {
       limpio,
       conTresOMas: resumir(antes.filter(o => o.factores.aFavor >= 3)),
       conMenos: resumir(antes.filter(o => o.factores.aFavor < 3)),
+      conCuatroOMas: resumir(antes.filter(o => o.factores.aFavor >= 4)),
       gestion: { stopALaEntrada: media(antes.map(o => o.netoBE)), parcialYStopMovil: media(antes.map(o => o.netoGestion)) },
       flujo: { aFavor: resumir(antes.filter(o => o.flujoAFavor === true)), enContra: resumir(antes.filter(o => o.flujoAFavor === false)) },
       recorrido,
@@ -282,6 +289,84 @@ function agotamiento() {
 }
 const altaEfectividad = { rejilla, chatgpt: reglaChatGPT(), gemini: reglaGemini(), agotamiento: agotamiento() };
 
+// ---------- Plan por horario ----------
+// Cada bloque de 6 horas con el contexto que había al empezar (dirección de 4 h y de 30 m, en velas ya cerradas)
+// y lo que el precio hizo dentro del bloque. De aquí salen las frecuencias que muestra la app y el registro.
+const filasPlan = bloquesDelPlan(prep['15m'], prep[P.plan.macro], prep[P.plan.micro], P.contexto).filter(g => g.completo);
+const r2 = x => Math.round(x * 100) / 100;
+const pctDe = (xs, f) => (xs.length ? Math.round(100 * xs.filter(f).length / xs.length) : null);
+// Lo que hizo un grupo de bloques: cuántos subieron y bajaron, hasta dónde llegaron arriba y abajo desde su
+// apertura (lo típico y lo que solo 2 de cada 10 rebasaron) y qué extremo se formó primero.
+const estadistica = xs => {
+  const arriba = xs.map(g => 100 * (g.h / g.o - 1));
+  const abajo = xs.map(g => 100 * (1 - g.l / g.o));
+  return {
+    n: xs.length,
+    sube: pctDe(xs, g => g.c > g.o),
+    baja: pctDe(xs, g => g.c < g.o),
+    arriba: { med: r2(cuantil(arriba, 0.5)), p80: r2(cuantil(arriba, 0.8)) },
+    abajo: { med: r2(cuantil(abajo, 0.5)), p80: r2(cuantil(abajo, 0.8)) },
+    primeroArriba: pctDe(xs, g => g.iH < g.iL),
+    primeroAbajo: pctDe(xs, g => g.iL < g.iH),
+  };
+};
+const planCeldas = {};
+for (const k of [0, 1, 2, 3]) for (const macro of [-1, 0, 1]) for (const micro of [-1, 0, 1]) {
+  const xs = filasPlan.filter(g => g.k === k && g.macro === macro && g.micro === micro);
+  if (xs.length) planCeldas[`${k}|${macro}|${micro}`] = estadistica(xs);
+}
+// El horario solo, sin contexto, y partido en dos tramos para ver si se sostiene.
+const planHoras = [0, 1, 2, 3].map(k => {
+  const xs = filasPlan.filter(g => g.k === k);
+  const tramo = ys => ({ n: ys.length, sube: pctDe(ys, g => g.c > g.o), baja: pctDe(ys, g => g.c < g.o) });
+  const porAnio = {};
+  for (const g of xs) { const a = new Date(g.t).getUTCFullYear(); (porAnio[a] = porAnio[a] || []).push(g); }
+  return { ...estadistica(xs), historia: tramo(xs.filter(g => g.t < corte)), limpio: tramo(xs.filter(g => g.t >= corte)), porAnio: Object.fromEntries(Object.entries(porAnio).map(([a, ys]) => [a, tramo(ys)])) };
+});
+const direccionPlan = g => (g.macro !== 0 ? g.macro : g.micro);
+const clasePlan = g => (g.macro !== 0 && g.micro === g.macro ? 'alineados' : g.macro !== 0 && g.micro === -g.macro ? 'micro en contra' : g.macro !== 0 ? 'micro lateral' : g.micro !== 0 ? 'solo micro' : 'sin dirección');
+// Con qué frecuencia el bloque cerró en la dirección del plan, y cuánto dejó en promedio seguirlo a ciegas (sin costo).
+const aFavorDe = xs => {
+  const ys = xs.filter(g => g.c !== g.o);
+  if (!ys.length) return { n: 0, aFavor: null, medio: null };
+  return {
+    n: ys.length,
+    aFavor: Math.round(1000 * ys.filter(g => Math.sign(g.c - g.o) === direccionPlan(g)).length / ys.length) / 10,
+    medio: r2(ys.reduce((s, g) => s + direccionPlan(g) * 100 * (g.c / g.o - 1), 0) / ys.length),
+  };
+};
+const planResumen = {};
+const grupos = {
+  alineados: g => clasePlan(g) === 'alineados',
+  'alineados a la baja': g => clasePlan(g) === 'alineados' && g.macro < 0,
+  'alineados al alza': g => clasePlan(g) === 'alineados' && g.macro > 0,
+  'micro en contra': g => clasePlan(g) === 'micro en contra',
+  'micro lateral': g => clasePlan(g) === 'micro lateral',
+  'solo micro': g => clasePlan(g) === 'solo micro',
+  'con dirección': g => direccionPlan(g) !== 0,
+};
+for (const [nombre, f] of Object.entries(grupos)) {
+  const xs = filasPlan.filter(f);
+  planResumen[nombre] = { historia: aFavorDe(xs.filter(g => g.t < corte)), limpio: aFavorDe(xs.filter(g => g.t >= corte)) };
+}
+const planBase = { n: filasPlan.length, baja: pctDe(filasPlan, g => g.c < g.o), sube: pctDe(filasPlan, g => g.c > g.o) };
+
+// Registro completo, para abrir en una hoja de cálculo.
+const HORAS = ['18:00–00:00', '00:00–06:00', '06:00–12:00', '12:00–18:00'];
+const palabra = d => (d > 0 ? 'alcista' : d < 0 ? 'bajista' : 'lateral');
+const fechaLocal = t => new Date(t).toLocaleString('sv-SE', { timeZone: 'America/Mexico_City' }).slice(0, 16);
+const lineasCsv = ['inicio (Guadalajara),bloque,4 h,30 m,plan,apertura,máximo,mínimo,cierre,cambio %,arriba %,abajo %,extremo que llegó primero,resultado del plan'];
+for (const g of filasPlan) {
+  const d = direccionPlan(g);
+  const cambio = 100 * (g.c / g.o - 1);
+  lineasCsv.push([
+    fechaLocal(g.t), HORAS[g.k], palabra(g.macro), palabra(g.micro), d ? palabra(d) : 'sin dirección', g.o, g.h, g.l, g.c,
+    cambio.toFixed(2), (100 * (g.h / g.o - 1)).toFixed(2), (100 * (1 - g.l / g.o)).toFixed(2),
+    g.iH < g.iL ? 'máximo' : g.iL < g.iH ? 'mínimo' : 'igual', d === 0 || cambio === 0 ? '' : Math.sign(cambio) === d ? 'acertó' : 'falló',
+  ].join(','));
+}
+await writeFile(new URL('datos/registro-del-mapa.csv', raiz), '﻿' + lineasCsv.join('\r\n'));
+
 const evidencia = {
   hecho: new Date().toISOString(),
   huella: createHash('sha256').update(textoMotor).update(textoParametros).digest('hex').slice(0, 16),
@@ -291,6 +376,7 @@ const evidencia = {
   funding: 'incluido',
   celdas,
   altaEfectividad,
+  plan: { macro: P.plan.macro, micro: P.plan.micro, base: planBase, resumen: planResumen, horas: planHoras, celdas: planCeldas },
 };
 await writeFile(new URL('reglas/evidencia.json', raiz), JSON.stringify(evidencia, null, 1));
 
@@ -311,3 +397,15 @@ for (const [k, x] of Object.entries(rejilla)) if (/^(3h|4h|1d)\|corto/.test(k) |
 linea('ChatGPT: agresión compradora fallida', altaEfectividad.chatgpt);
 linea('Gemini: ruptura fallida con funding', altaEfectividad.gemini);
 linea('Gemini: agotamiento tras un salto', altaEfectividad.agotamiento);
+
+console.log('\nFrancotirador micro (disparo en 5 m) y si las condiciones separan (3 o más contra menos):');
+for (const [k, c] of Object.entries(celdas)) {
+  if (!k.startsWith('tirador|')) continue;
+  const micro = TM.marcos.includes(k.split('|')[1]);
+  console.log(`${micro ? 'TM' : 'TC'} ${k.padEnd(20)} n ${String(c.historia.n).padStart(4)} neto ${n(c.historia.neto, 3).padStart(7)} factor ${n(c.historia.factor)} piso ${n(c.historia.piso, 3)} caída ${n(c.historia.caida, 1)} stop ${n(c.stopMedioPct)} % | limpio ${c.limpio.n} ${n(c.limpio.neto, 3)} | 4+ ${c.conCuatroOMas.n} ${n(c.conCuatroOMas.neto, 3)} · 3+ ${c.conTresOMas.n} ${n(c.conTresOMas.neto, 3)} · menos ${c.conMenos.n} ${n(c.conMenos.neto, 3)} | ${c.etiqueta}`);
+}
+console.log(`\nPlan por horario: ${planBase.n} bloques; bajó ${planBase.baja} %, subió ${planBase.sube} %. Cerró en la dirección del plan (% de casos, cambio medio a favor | desde el corte):`);
+for (const [k, x] of Object.entries(planResumen)) console.log(`PL ${k.padEnd(22)} ${x.historia.aFavor} % de ${x.historia.n} · ${x.historia.medio} % | ${x.limpio.aFavor} % de ${x.limpio.n} · ${x.limpio.medio} %`);
+for (const [k, c] of Object.entries(planCeldas)) console.log(`PC ${k.padEnd(8)} n ${String(c.n).padStart(4)} sube ${c.sube} baja ${c.baja} · arriba ${c.arriba.med}/${c.arriba.p80} · abajo ${c.abajo.med}/${c.abajo.p80} · primero máximo ${c.primeroArriba} mínimo ${c.primeroAbajo}`);
+console.log('\nEl horario solo (bajó %, casos | desde el corte | por año):');
+planHoras.forEach((x, k) => console.log(`PH ${HORAS[k]} bajó ${x.baja} % de ${x.n} · arriba ${x.arriba.med}/${x.arriba.p80} · abajo ${x.abajo.med}/${x.abajo.p80} · primero máximo ${x.primeroArriba} | ${x.limpio.baja} % de ${x.limpio.n} | ${Object.entries(x.porAnio).map(([a, y]) => `${a}: ${y.baja} % de ${y.n}`).join(', ')}`));

@@ -119,3 +119,45 @@ Emmanuel pidió una regla con 75 % a 80 % de aciertos o más. Se midieron cuatro
 - Con el stop corto del disparo también se acierta 80 %, pero el costo se come la ganancia.
 - Llegar a 90 % pediría un objetivo todavía más corto; con costo de 0.20 % la ganancia por acierto quedaría por debajo de lo que cuesta una sola pérdida entre diez.
 - Con el mismo disparo, subir el objetivo baja los aciertos y sube lo que deja cada operación.
+
+## Versión 4: francotirador en lo que manda y en el micro, y mapa del día por horario
+
+### Francotirador micro
+
+La misma regla del francotirador, con la idea en 15, 30 o 45 m y el disparo en una vela de 5 m. Stop entre 0.6 % y 2.0 %. Así, lo que manda ahora, la opción macro y la opción micro tienen cada una su francotirador.
+
+| Idea | Lado | Casos | Neto por operación | Del 16 de septiembre en adelante |
+|---|---|---|---|---|
+| 15 m | corto | 1649 | −0.14 R | 113 casos, −0.21 R |
+| 15 m | largo | 1355 | −0.23 R | 82 casos, −0.24 R |
+| 30 m | corto | 1361 | −0.10 R | 102 casos, −0.29 R |
+| 30 m | largo | 1077 | −0.22 R | 56 casos, −0.04 R |
+| 45 m | corto | 1167 | −0.17 R | 109 casos, −0.40 R |
+| 45 m | largo | 901 | −0.22 R | 59 casos, −0.02 R |
+
+- Las seis celdas pierden. El stop medio es de 0.9 % a 1.1 %, así que el costo de 0.20 % se lleva cerca de 0.2 R en cada operación.
+- La app lo muestra con la etiqueta «sin respaldo». Sirve para ver por dónde va el impulso corto, no como operación con ventaja.
+
+### Las condiciones no son una calificación
+
+Se midió si cumplir más condiciones deja mejor resultado. No hay un patrón que se repita:
+
+- En los cortos de 4 h y de 3 h, con 4 o más condiciones salió mejor (+0.55 R en 111 casos y +0.33 R en 118).
+- En los cortos de 1 h y de 2 h, con 4 o más salió peor (−0.29 R en 157 casos y −0.22 R en 122).
+- Por eso la tarjeta ya no pinta el número de condiciones como bueno o malo: dice cuáles se cumplen y si en esa regla cumplir más ha servido.
+
+### Mapa del día por horario
+
+Bloques de 6 horas en hora de Guadalajara. Para cada uno se midió, en toda la historia, lo que hizo el precio desde la apertura del bloque. «Típico» es lo que recorrió la mitad de los bloques; «amplio», lo que solo 2 de cada 10 rebasaron.
+
+| Horario | Bajó | Arriba, típico y amplio | Abajo, típico y amplio | Nota |
+|---|---|---|---|---|
+| 18:00–00:00 | 50 % de 1220 | 1.71 % y 3.65 % | 1.68 % y 3.56 % | |
+| 00:00–06:00 | 54 % de 1220 | 1.39 % y 3.36 % | 1.70 % y 3.24 % | |
+| 06:00–12:00 | 56 % de 1221 | 1.80 % y 4.20 % | 2.27 % y 4.58 % | El de más recorrido. Hace primero el máximo 56 % de las veces. Por año: 60, 59, 56 y 52 % |
+| 12:00–18:00 | 52 % de 1221 | 1.52 % y 3.42 % | 1.63 % y 3.58 % | |
+
+- WLD bajó en 53 % de todos los bloques, así que una inclinación bajista solo cuenta si supera eso.
+- La dirección de 4 h y de 30 m al empezar el bloque no dice hacia dónde cierra: coincidió 49.9 % de 4502 veces. Con macro y micro alineados, 49.8 % de 2446.
+- Lo que sí es estable es el tamaño del recorrido por horario. Con eso la app dice si la zona del francotirador queda dentro de lo que ese horario suele recorrer.
+- El registro de cada bloque (contexto al empezar, apertura, máximo, mínimo, cierre y qué extremo hizo primero) se reconstruye en la app con las velas de Binance; el registro completo de la historia queda en Drive, en «Registro del mapa del día».
