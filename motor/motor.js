@@ -12,6 +12,8 @@ export const NATIVAS = { '1m': 1, '5m': 5, '15m': 15, '1h': 60, '4h': 240, '1d':
 export const ARMADAS = { '3m': ['1m', 3], '30m': ['15m', 30], '45m': ['15m', 45], '2h': ['1h', 120], '3h': ['1h', 180] };
 // De mayor a menor, como se leen en pantalla.
 export const MARCOS = ['1w', '1d', '4h', '3h', '2h', '1h', '45m', '30m', '15m', '5m', '3m', '1m'];
+// De menor a mayor, para seguir hasta dónde llega un movimiento.
+export const ESCALERA = ['15m', '30m', '45m', '1h', '2h', '3h', '4h', '1d', '1w'];
 
 // ---------- Datos ----------
 
@@ -62,6 +64,15 @@ export function agrupar(velas, minutosBase, minutosDestino) {
     .filter(g => g.partes === esperadas)
     .sort((a, b) => a.t - b.t)
     .map(({ partes, ...vela }) => vela);
+}
+
+// Completa las series armadas a partir de las nativas que haya.
+export function armarTodas(nativas) {
+  const series = { ...nativas };
+  for (const [marco, [base, minutos]] of Object.entries(ARMADAS)) {
+    if (nativas[base]) series[marco] = agrupar(nativas[base], NATIVAS[base], minutos);
+  }
+  return series;
 }
 
 // ---------- Indicadores ----------
@@ -133,8 +144,7 @@ export function adx(v, n = 14) {
 
 // Fuerza con signo, de −100 a 100: cuánto avanzó el precio en n velas contra todo lo que caminó.
 // 100 es una línea recta hacia arriba; cerca de 0 es ir y venir sin avanzar.
-export function eficiencia(cierres, n = 20) {
-  const i = cierres.length - 1;
+export function eficiencia(cierres, n = 20, i = cierres.length - 1) {
   if (i < n) return null;
   let camino = 0;
   for (let k = i - n + 1; k <= i; k++) camino += Math.abs(cierres[k] - cierres[k - 1]);
@@ -148,28 +158,46 @@ export function percentil(serie, valor) {
   return 100 * xs.filter(x => x <= valor).length / xs.length;
 }
 
+// El valor que deja debajo a la fracción q de la serie.
+export function cuantil(serie, q) {
+  const xs = serie.filter(x => x != null).sort((a, b) => a - b);
+  if (!xs.length) return null;
+  const pos = (xs.length - 1) * q;
+  const lo = Math.floor(pos);
+  const hi = Math.ceil(pos);
+  return xs[lo] + (xs[hi] - xs[lo]) * (pos - lo);
+}
+
 // ---------- Lectura del mercado ----------
 
+// Deja listos los indicadores de una serie, una sola vez.
+export function preparar(velas, C) {
+  const c = velas.map(b => b.c);
+  return { velas, c, rapida: ema(c, C.emaRapida), lenta: ema(c, C.emaLenta), rango: atr(velas, 14) };
+}
+
+// Dirección de fondo en la vela i: cierre contra la EMA lenta y pendiente de la EMA rápida.
+export function direccionEn(p, i, C) {
+  if (i < C.velasPendiente || p.lenta[i] == null || p.rapida[i - C.velasPendiente] == null) return 0;
+  const pendiente = p.rapida[i] - p.rapida[i - C.velasPendiente];
+  return p.c[i] > p.lenta[i] && pendiente > 0 ? 1 : p.c[i] < p.lenta[i] && pendiente < 0 ? -1 : 0;
+}
+
 // Sesgo y fuerza de una temporalidad.
-// Sesgo: cierre contra la EMA lenta y pendiente de la EMA rápida. Fuerza: la eficiencia, sin signo.
 export function leerMarco(velas, C) {
-  if (velas.length < C.emaLenta + C.velasFuerza) return { listo: false, velas: velas.length };
-  const cierres = velas.map(b => b.c);
-  const i = cierres.length - 1;
-  const rapida = ema(cierres, C.emaRapida);
-  const lenta = ema(cierres, C.emaLenta);
-  const pendiente = rapida[i] - rapida[i - C.velasPendiente];
-  const direccion = cierres[i] > lenta[i] && pendiente > 0 ? 1
-    : cierres[i] < lenta[i] && pendiente < 0 ? -1 : 0;
-  const f = eficiencia(cierres, C.velasFuerza);
+  if (!velas || velas.length < C.emaLenta + C.velasFuerza) return { listo: false, velas: velas ? velas.length : 0 };
+  const p = preparar(velas, C);
+  const i = velas.length - 1;
+  const direccion = direccionEn(p, i, C);
+  const f = eficiencia(p.c, C.velasFuerza);
   const fuerza = Math.round(Math.abs(f));
   const lateral = direccion === 0 || fuerza < C.fuerzaLateral;
   return {
     listo: true,
     hora: velas[i].t,
-    cierre: cierres[i],
-    emaRapida: rapida[i],
-    emaLenta: lenta[i],
+    cierre: p.c[i],
+    emaRapida: p.rapida[i],
+    emaLenta: p.lenta[i],
     direccion,
     sesgo: lateral ? 'lateral' : direccion > 0 ? 'alcista' : 'bajista',
     fuerza,
@@ -179,90 +207,559 @@ export function leerMarco(velas, C) {
   };
 }
 
-// Quién manda: la temporalidad más alta con tendencia clara.
+// Quién manda: hasta qué temporalidad llega, sin interrumpirse, la dirección que nace en 15 m.
+// Fondo: la temporalidad más alta con tendencia clara.
 export function quienManda(marcos, C) {
-  for (const m of MARCOS) {
-    const x = marcos[m];
-    if (x && x.listo && x.direccion !== 0 && x.adx > C.adxTendencia) return m;
+  const base = marcos['15m'];
+  let manda = null;
+  if (base && base.listo && base.direccion !== 0) {
+    manda = '15m';
+    for (const m of ESCALERA.slice(1)) {
+      const x = marcos[m];
+      if (!x || !x.listo || x.direccion === 0) continue; // neutral: se salta
+      if (x.direccion === base.direccion) manda = m;      // misma dirección: el movimiento llega hasta aquí
+      else break;                                         // contraria: aquí se detiene
+    }
   }
-  return null;
+  let fondo = null;
+  for (const m of [...ESCALERA].reverse()) {
+    const x = marcos[m];
+    if (x && x.listo && x.direccion !== 0 && x.adx > C.adxTendencia) { fondo = m; break; }
+  }
+  return {
+    manda,
+    direccion: manda ? base.direccion : 0,
+    fondo,
+    direccionFondo: fondo ? marcos[fondo].direccion : 0,
+  };
 }
 
-// ---------- Regla swing: dónde abre y dónde se invalida ----------
+// ---------- Reglas ----------
 
-export function zonaSwing(velas4h, S, C) {
-  const cierres = velas4h.map(b => b.c);
-  const i = cierres.length - 1;
-  const rapida = ema(cierres, C.emaRapida)[i];
-  const lenta = ema(cierres, C.emaLenta)[i];
-  const rango = atr(velas4h, 14)[i];
-  const precio = cierres[i];
-  if (rapida == null || lenta == null || rango == null) return { lado: null, motivo: 'faltan velas de 4 h' };
+// Régimen de la propia temporalidad en la vela i: −1 corto, 1 largo, 0 ninguno.
+// Pide que las dos EMA estén separadas, para no dar zona en un mercado plano.
+export function regimen(p, i, R) {
+  const a = p.rango[i];
+  if (i < 0 || a == null || p.lenta[i] == null) return 0;
+  const separacion = p.rapida[i] - p.lenta[i];
+  if (separacion <= -R.separacionAtr * a && p.c[i] < p.lenta[i]) return -1;
+  if (separacion >= R.separacionAtr * a && p.c[i] > p.lenta[i]) return 1;
+  return 0;
+}
 
-  let lado = null;
-  let desde;
-  let hasta;
-  let invalida;
-  if (rapida < lenta && precio < lenta) {
-    lado = 'corto';
-    desde = rapida;
-    hasta = Math.min(lenta, rapida + S.anchoZonaAtr * rango);
-    const ideal = (desde + hasta) / 2;
-    invalida = Math.max(hasta + S.margenInvalidacionAtr * rango, ideal * (1 + S.invalidacionMinima));
-  } else if (precio > rapida && rapida > lenta) {
-    lado = 'largo';
-    hasta = rapida;
-    desde = Math.max(lenta, rapida - S.anchoZonaAtr * rango);
-    const ideal = (desde + hasta) / 2;
-    invalida = Math.min(desde - S.margenInvalidacionAtr * rango, ideal * (1 - S.invalidacionMinima));
-  } else {
-    return { lado: null, motivo: 'las 4 h no tienen régimen claro' };
-  }
+// Stop mínimo en ATR: en las temporalidades chicas es más ancho, porque el costo pesa más.
+function stopMinimo(K, marco) {
+  return (K.stopMinimoPorMarco && K.stopMinimoPorMarco[marco]) || K.stopMinimoAtr;
+}
+
+// Zona del retroceso en la vela i: dónde abre, dónde se invalida y los objetivos si se entra en la zona.
+export function zona(p, i, lado, R, marco) {
+  const a = p.rango[i];
+  const r = p.rapida[i];
+  const l = p.lenta[i];
+  const desde = lado < 0 ? r : Math.max(l, r - R.anchoZonaAtr * a);
+  const hasta = lado < 0 ? Math.min(l, r + R.anchoZonaAtr * a) : r;
   const ideal = (desde + hasta) / 2;
-  const riesgo = Math.abs(invalida - ideal);
-  const signo = lado === 'corto' ? -1 : 1;
+  const borde = lado < 0 ? hasta + R.margenInvalidacionAtr * a : desde - R.margenInvalidacionAtr * a;
+  const riesgo = Math.max(Math.abs(borde - ideal), stopMinimo(R, marco) * a);
   return {
-    lado,
-    desde,
-    hasta,
-    ideal,
-    invalida,
+    desde, hasta, ideal,
+    invalida: ideal - lado * riesgo,
     riesgoPct: 100 * riesgo / ideal,
-    objetivo1: ideal + signo * S.objetivo1R * riesgo,
-    objetivo2: ideal + signo * S.objetivo2R * riesgo,
-    precioEnZona: precio >= desde && precio <= hasta,
+    objetivo1: ideal + lado * R.objetivo1R * riesgo,
+    objetivo2: ideal + lado * R.objetivo2R * riesgo,
   };
+}
+
+// Índice de la última vela ya cerrada en el instante t.
+function ultimaCerrada(p, t) {
+  let lo = 0;
+  let hi = p.velas.length - 1;
+  let r = -1;
+  while (lo <= hi) {
+    const m = (lo + hi) >> 1;
+    if (p.velas[m].fin <= t) { r = m; lo = m + 1; } else hi = m - 1;
+  }
+  return r;
+}
+
+// Lugar del rango de la vela i, como porcentaje del precio, contra sus velas anteriores.
+function lugarVolatilidad(p, i, V) {
+  if (p.rango[i] == null) return null;
+  const x = p.rango[i] / p.c[i];
+  let n = 0;
+  let menores = 0;
+  for (let k = Math.max(0, i - V.velas + 1); k <= i; k++) {
+    if (p.rango[k] == null) continue;
+    n++;
+    if (p.rango[k] / p.c[k] <= x) menores++;
+  }
+  return n < 50 ? null : 100 * menores / n;
+}
+
+// Factores a favor de una operación. No bloquean: se cuentan y se muestran.
+function factores(p, i, lado, regla, P, ctx, extra) {
+  const C = P.contexto;
+  const t = p.velas[i].fin;
+  const lista = [];
+  const sup = ctx.superior ? direccionEn(ctx.superior, ultimaCerrada(ctx.superior, t), C) : null;
+  lista.push(['Temporalidad superior alineada', sup == null ? null : sup === lado]);
+  const b = ctx.btc ? direccionEn(ctx.btc, ultimaCerrada(ctx.btc, t), C) : null;
+  lista.push(['BTC alineado', b == null ? null : b === lado]);
+  const vol = lugarVolatilidad(p, i, P.volatilidad);
+  lista.push(['Volatilidad operable', vol == null ? null : vol >= P.volatilidad.minimo && vol <= P.volatilidad.maximo]);
+  if (regla !== 'barrido') {
+    const f = eficiencia(p.c, C.velasFuerza, i);
+    lista.push(['Fuerza a favor', f == null ? null : Math.sign(f) === lado && Math.abs(f) >= C.fuerzaLateral]);
+  } else {
+    lista.push(['Volumen bajo en el barrido', extra ? extra.volumenBajo : null]);
+  }
+  return { lista, aFavor: lista.filter(x => x[1] === true).length, de: lista.filter(x => x[1] != null).length };
+}
+
+function cerrar(op, precio, motivo, vela, i) {
+  op.salida = precio;
+  op.motivo = motivo;
+  op.tSalida = vela.fin;
+  op.velas = i - op.i;
+  op.bruto = op.lado * (precio - op.entrada) / op.riesgo;
+  op.neto = op.bruto - op.costoR;
+  op.estado = 'cerrada';
+  return true;
+}
+
+// Avanza una operación abierta con una vela cerrada. Si la misma vela toca stop y objetivo, cuenta el stop.
+function avanzar(op, vela, i) {
+  const s = op.lado;
+  const tocaStop = s > 0 ? vela.l <= op.stop : vela.h >= op.stop;
+  const toca1 = s > 0 ? vela.h >= op.objetivo1 : vela.l <= op.objetivo1;
+  const toca2 = s > 0 ? vela.h >= op.objetivo2 : vela.l <= op.objetivo2;
+  if (tocaStop) return cerrar(op, op.stop, 'stop', vela, i);
+  if (toca1) op.toco1 = true;
+  if (toca2) return cerrar(op, op.objetivo2, 'objetivo 2', vela, i);
+  if (i - op.i >= op.vence) return cerrar(op, vela.c, 'tiempo', vela, i);
+  return false;
+}
+
+// Recorre una serie de velas cerradas y aplica las reglas:
+//   zona:      en tendencia, orden límite en el punto medio de la zona entre las dos EMA;
+//   retroceso: lo mismo, pero espera a que una vela confirme después de tocar la zona;
+//   barrido:   el precio rebasa el extremo de las últimas velas y cierra de vuelta (ruptura fallida).
+// Devuelve todas las operaciones y el estado vivo de cada regla. Es el mismo código para la app y para las pruebas.
+export function simular(p, marco, P, ctx = {}) {
+  const v = p.velas;
+  const n = v.length;
+  const R = P.retroceso;
+  const B = P.barrido;
+  const C = P.contexto;
+  const ops = [];
+  const ini = Math.max(C.emaLenta + C.velasPendiente + 1, B.velasRango + 15);
+  let opZ = null;
+  let opR = null;
+  let opB = null;
+  let armada = 0;
+  let toque = null;
+  let barr = null;
+
+  const abrir = (regla, i, lado, entrada, riesgo, K, extra) => {
+    const op = {
+      id: `${regla}|${marco}|${v[i].fin}`,
+      regla, marco, lado, i,
+      t: v[i].fin,
+      entrada, riesgo,
+      riesgoPct: 100 * riesgo / entrada,
+      stop: entrada - lado * riesgo,
+      objetivo1: entrada + lado * K.objetivo1R * riesgo,
+      objetivo2: entrada + lado * K.objetivo2R * riesgo,
+      vence: K.vencimientoVelas,
+      costoR: P.costos.idaYVueltaPct / 100 * entrada / riesgo,
+      toco1: false,
+      estado: 'abierta',
+      // En la entrada en zona se cuentan con la vela anterior: la del llenado todavía no cerraba.
+      factores: factores(p, extra && extra.velaFactores != null ? extra.velaFactores : i, lado, regla, P, ctx, extra),
+    };
+    if (extra && extra.datos) Object.assign(op, extra.datos);
+    ops.push(op);
+    return op;
+  };
+
+  for (let i = ini; i < n; i++) {
+    const b = v[i];
+    const a = p.rango[i];
+
+    // Operaciones abiertas.
+    if (opZ && avanzar(opZ, b, i)) opZ = null;
+    if (opR && avanzar(opR, b, i)) opR = null;
+    if (opB && avanzar(opB, b, i)) opB = null;
+
+    // Retroceso en tendencia.
+    const lado = regimen(p, i, R);
+    const previo = regimen(p, i - 1, R);
+    if (previo !== 0) {
+      // Entrada en zona: la orden se arma cuando el precio cierra fuera de la zona, del lado de la tendencia,
+      // y se llena cuando una vela llega al punto medio. En la vela del llenado solo se revisa el stop.
+      const z = zona(p, i - 1, previo, R, marco);
+      if (armada === previo && !opZ && (previo < 0 ? b.h >= z.ideal : b.l <= z.ideal)) {
+        armada = 0;
+        opZ = abrir('zona', i, previo, z.ideal, Math.abs(z.invalida - z.ideal), R, { velaFactores: i - 1 });
+        if (previo < 0 ? b.h >= opZ.stop : b.l <= opZ.stop) { cerrar(opZ, opZ.stop, 'stop', b, i); opZ = null; }
+      }
+      if (previo < 0 ? b.c < z.desde : b.c > z.hasta) armada = previo;
+    } else {
+      armada = 0;
+    }
+    if (lado !== 0 && previo === lado) {
+      const z = zona(p, i - 1, lado, R, marco);
+      if (lado < 0 ? b.h >= z.desde : b.l <= z.hasta) {
+        if (!toque || toque.lado !== lado || i - toque.ultimo > R.velasEspera) {
+          toque = { lado, i, ultimo: i, extremo: lado < 0 ? b.h : b.l };
+        } else {
+          toque.ultimo = i;
+        }
+      }
+    }
+    if (toque) {
+      if (toque.lado !== lado || i - toque.ultimo > R.velasEspera) toque = null;
+      else toque.extremo = toque.lado < 0 ? Math.max(toque.extremo, b.h) : Math.min(toque.extremo, b.l);
+    }
+    if (toque && !opR && (lado < 0 ? b.c < v[i - 1].l : b.c > v[i - 1].h)) {
+      // El stop va detrás del extremo del retroceso, medido solo en las últimas velas.
+      let extremo = lado < 0 ? -Infinity : Infinity;
+      for (let k = Math.max(toque.i, i - R.velasEspera); k <= i; k++) extremo = lado < 0 ? Math.max(extremo, v[k].h) : Math.min(extremo, v[k].l);
+      const riesgo = Math.max(Math.abs(extremo - lado * R.margenStopAtr * a - b.c), stopMinimo(R, marco) * a);
+      opR = abrir('retroceso', i, lado, b.c, riesgo, R);
+      toque = null;
+    }
+
+    // Ruptura fallida.
+    if (!opB) {
+      if (!barr) {
+        let alto = -Infinity;
+        let bajo = Infinity;
+        let volumen = 0;
+        for (let k = i - B.velasRango; k < i; k++) {
+          alto = Math.max(alto, v[k].h);
+          bajo = Math.min(bajo, v[k].l);
+          volumen += v[k].v;
+        }
+        const arriba = b.h > alto + B.excesoAtr * a;
+        const abajo = b.l < bajo - B.excesoAtr * a;
+        if (arriba !== abajo) {
+          barr = {
+            lado: arriba ? -1 : 1, i,
+            nivel: arriba ? alto : bajo,
+            otro: arriba ? bajo : alto,
+            extremo: arriba ? b.h : b.l,
+            volumenBajo: b.v < volumen / B.velasRango,
+          };
+        }
+      } else {
+        barr.extremo = barr.lado < 0 ? Math.max(barr.extremo, b.h) : Math.min(barr.extremo, b.l);
+      }
+      if (barr) {
+        if (barr.lado < 0 ? b.c < barr.nivel : b.c > barr.nivel) {
+          const riesgo = Math.max(Math.abs(barr.extremo - barr.lado * B.margenStopAtr * a - b.c), stopMinimo(B, marco) * a);
+          opB = abrir('barrido', i, barr.lado, b.c, riesgo, B, { volumenBajo: barr.volumenBajo, datos: { nivel: barr.nivel, objetivo3: barr.otro } });
+          barr = null;
+        } else if (i - barr.i >= B.velasRegreso - 1) {
+          barr = null;
+        }
+      }
+    }
+  }
+
+  // Estado vivo, con la última vela cerrada.
+  const u = n - 1;
+  const vivo = { zona: { estado: 'sin operación' }, retroceso: { estado: 'sin operación' }, barrido: { estado: 'sin operación' } };
+  if (u >= ini) {
+    const lado = regimen(p, u, R);
+    if (opZ) vivo.zona = { estado: 'en operación', op: opZ };
+    if (opR) vivo.retroceso = { estado: 'en operación', op: opR };
+    else if (lado !== 0) {
+      vivo.retroceso = {
+        estado: toque ? 'en zona' : 'preparando',
+        lado,
+        ...zona(p, u, lado, R, marco),
+        gatillo: lado < 0 ? v[u].l : v[u].h,
+        factores: factores(p, u, lado, 'retroceso', P, ctx),
+      };
+    }
+    if (opB) vivo.barrido = { estado: 'en operación', op: opB };
+    else if (barr) {
+      vivo.barrido = { estado: 'barrido en curso', lado: barr.lado, nivel: barr.nivel, quedan: B.velasRegreso - 1 - (u - barr.i) };
+    } else {
+      let alto = -Infinity;
+      let bajo = Infinity;
+      for (let k = u - B.velasRango + 1; k <= u; k++) { alto = Math.max(alto, v[k].h); bajo = Math.min(bajo, v[k].l); }
+      vivo.barrido = { estado: 'vigilando', arriba: alto, abajo: bajo };
+    }
+  }
+  return { ops, vivo };
+}
+
+// Resumen de un grupo de operaciones cerradas. «estres» multiplica el costo (1.5 = 0.30 % en vez de 0.20 %).
+export function resumir(ops, estres = 1) {
+  const c = ops.filter(o => o.estado === 'cerrada');
+  if (!c.length) return { n: 0 };
+  let suma = 0;
+  let gana = 0;
+  let pierde = 0;
+  let acumulado = 0;
+  let pico = 0;
+  let caida = 0;
+  let t1 = 0;
+  let t2 = 0;
+  for (const o of c) {
+    const r = o.bruto - o.costoR * estres;
+    suma += r;
+    if (r > 0) gana += r; else pierde -= r;
+    acumulado += r;
+    pico = Math.max(pico, acumulado);
+    caida = Math.max(caida, pico - acumulado);
+    if (o.toco1) t1++;
+    if (o.motivo === 'objetivo 2') t2++;
+  }
+  const red = x => Math.round(x * 1000) / 1000;
+  return {
+    n: c.length,
+    neto: red(suma / c.length),
+    factor: pierde ? red(gana / pierde) : null,
+    caida: red(caida),
+    toco1: Math.round(100 * t1 / c.length),
+    objetivo2: Math.round(100 * t2 / c.length),
+  };
+}
+
+// ---------- Contexto ----------
+
+// Fase aproximada: busca la ruptura de un rango de N velas que sigue vigente y proyecta su final
+// con la amplitud de ese rango. Es geometría, no pronóstico.
+export function leerFase(p, F) {
+  const v = p.velas;
+  const n = v.length;
+  const N = F.velasRango;
+  let fase = null;
+  for (let i = N; i < n; i++) {
+    let alto = -Infinity;
+    let bajo = Infinity;
+    for (let k = i - N; k < i; k++) { alto = Math.max(alto, v[k].h); bajo = Math.min(bajo, v[k].l); }
+    const c = p.c[i];
+    if (fase) {
+      const dentro = x => (fase.lado < 0 ? x > fase.nivel : x < fase.nivel);
+      if (dentro(c) && dentro(p.c[i - 1])) fase = null;
+    }
+    const rompe = c < bajo ? -1 : c > alto ? 1 : 0;
+    if (rompe !== 0 && (!fase || fase.lado !== rompe)) {
+      fase = { lado: rompe, t: v[i].t, nivel: rompe < 0 ? bajo : alto, amplitud: alto - bajo };
+    }
+  }
+  if (!fase) {
+    let alto = -Infinity;
+    let bajo = Infinity;
+    for (let k = n - N; k < n; k++) { alto = Math.max(alto, v[k].h); bajo = Math.min(bajo, v[k].l); }
+    return { clara: false, techo: alto, piso: bajo };
+  }
+  const final = fase.nivel + fase.lado * fase.amplitud;
+  const recorrido = 100 * fase.lado * (p.c[n - 1] - fase.nivel) / fase.amplitud;
+  return { clara: true, lado: fase.lado, inicio: fase.nivel, desde: fase.t, final, recorrido: Math.round(recorrido) };
+}
+
+// Mapa del día. El día empieza a las 00:00 UTC, que son las 18:00 en Guadalajara.
+// Techo y piso probables: solo 2 de cada 10 días pasados los rebasaron. Los bloques de 6 horas
+// llevan sesgo únicamente si se repitieron lo suficiente.
+export function mapaDelDia(v1d, v1h, precio, M, ahora = Date.now()) {
+  const hoy = Math.floor(ahora / DIA) * DIA;
+  const deHoy = v1h.filter(b => b.t >= hoy);
+  const apertura = deHoy.length ? deHoy[0].o : (v1d.length ? v1d.at(-1).c : precio);
+  let maximo = Math.max(apertura, precio);
+  let minimo = Math.min(apertura, precio);
+  for (const b of deHoy) { maximo = Math.max(maximo, b.h); minimo = Math.min(minimo, b.l); }
+  const dias = v1d.slice(-M.dias);
+  const techo = apertura * (1 + cuantil(dias.map(d => (d.h - d.o) / d.o), M.percentil / 100));
+  const piso = apertura * (1 - cuantil(dias.map(d => (d.o - d.l) / d.o), M.percentil / 100));
+
+  // Historia de cada bloque de 6 horas.
+  const conteo = [0, 1, 2, 3].map(() => ({ dias: 0, sube: 0 }));
+  const porDia = new Map();
+  for (const b of v1h) {
+    if (b.t >= hoy) continue;
+    const d = Math.floor(b.t / DIA);
+    const k = Math.floor((b.t % DIA) / (360 * MIN));
+    const clave = d * 4 + k;
+    let g = porDia.get(clave);
+    if (!g) porDia.set(clave, g = { k, o: b.o, c: b.c, n: 0 });
+    g.c = b.c;
+    g.n++;
+  }
+  for (const g of porDia.values()) {
+    if (g.n !== 6) continue;
+    conteo[g.k].dias++;
+    if (g.c > g.o) conteo[g.k].sube++;
+  }
+  const actual = Math.floor((ahora - hoy) / (360 * MIN));
+  const etiquetas = ['18:00–00:00', '00:00–06:00', '06:00–12:00', '12:00–18:00'];
+  const bloques = [0, 1, 2, 3].map(k => {
+    const velas = deHoy.filter(b => Math.floor((b.t - hoy) / (360 * MIN)) === k);
+    const h = conteo[k];
+    const frecuencia = h.dias ? Math.round(100 * h.sube / h.dias) : null;
+    let sesgo = 'sin sesgo';
+    if (h.dias >= M.diasMinimos && frecuencia >= M.frecuenciaSesgo) sesgo = 'alcista';
+    if (h.dias >= M.diasMinimos && frecuencia <= 100 - M.frecuenciaSesgo) sesgo = 'bajista';
+    return {
+      horas: etiquetas[k],
+      estado: k < actual ? 'cerrado' : k === actual ? 'en curso' : 'por venir',
+      cambio: velas.length ? 100 * ((k < actual ? velas.at(-1).c : precio) / velas[0].o - 1) : null,
+      sesgo,
+      frecuencia: sesgo === 'bajista' ? 100 - frecuencia : frecuencia,
+      dias: h.dias,
+    };
+  });
+  return { apertura, maximo, minimo, techo, piso, bloques };
+}
+
+function leerBtc(series, btc, P) {
+  const marcos = {};
+  for (const m of ['1d', '4h', '1h']) marcos[m] = leerMarco(btc[m], P.contexto);
+  const cambio = (v, n) => (v && v.length > n ? 100 * (v.at(-1).c / v.at(-1 - n).c - 1) : null);
+  const wld24 = cambio(series['1h'], 24);
+  const btc24 = cambio(btc['1h'], 24);
+  let correlacion = null;
+  const a = series['1h'];
+  const b = btc['1h'];
+  if (a && b && a.length > 49 && b.length > 49) {
+    const ra = [];
+    const rb = [];
+    for (let k = 48; k >= 1; k--) {
+      ra.push(a.at(-k).c / a.at(-k - 1).c - 1);
+      rb.push(b.at(-k).c / b.at(-k - 1).c - 1);
+    }
+    const media = x => x.reduce((s, y) => s + y, 0) / x.length;
+    const ma = media(ra);
+    const mb = media(rb);
+    let sab = 0;
+    let saa = 0;
+    let sbb = 0;
+    for (let k = 0; k < ra.length; k++) { sab += (ra[k] - ma) * (rb[k] - mb); saa += (ra[k] - ma) ** 2; sbb += (rb[k] - mb) ** 2; }
+    correlacion = saa && sbb ? sab / Math.sqrt(saa * sbb) : null;
+  }
+  return { marcos, wld24, btc24, diferencia: wld24 != null && btc24 != null ? wld24 - btc24 : null, correlacion };
+}
+
+async function traerExtras(simbolo, traer) {
+  const json = async url => {
+    try { const r = await traer(url); return r.ok ? await r.json() : null; } catch { return null; }
+  };
+  const [indice, cuentas] = await Promise.all([
+    json(`${BINANCE}/fapi/v1/premiumIndex?symbol=${simbolo}`),
+    json(`${BINANCE}/futures/data/topLongShortPositionRatio?symbol=${simbolo}&period=1h&limit=1`),
+  ]);
+  return {
+    precio: indice ? +indice.markPrice : null,
+    funding: indice ? 100 * +indice.lastFundingRate : null,
+    proximoFunding: indice ? +indice.nextFundingTime : null,
+    grandesCuentas: cuentas && cuentas[0] ? +cuentas[0].longShortRatio : null,
+  };
+}
+
+// La operación que va arriba en la pantalla: primero lo recién confirmado, luego lo que espera
+// confirmación, luego lo que se prepara. A igualdad, más factores a favor y temporalidad más alta.
+// «pesoEvidencia» deja pasar primero las reglas que sí han mostrado resultado en esa temporalidad.
+export function elegirPrincipal(porMarco, operables, ahora, mando, pesoEvidencia) {
+  const peso = { reciente: 5, 'en zona': 4, 'barrido en curso': 3, preparando: 2, 'en operación': 1 };
+  let mejor = null;
+  operables.forEach((marco, k) => {
+    for (const regla of ['retroceso', 'zona', 'barrido']) {
+      const x = porMarco[marco][regla];
+      if (!x || !peso[x.estado]) continue;
+      let estado = x.estado;
+      const minutos = NATIVAS[marco] || ARMADAS[marco][1];
+      if (estado === 'en operación' && ahora - x.op.t <= 2 * minutos * MIN) estado = 'reciente';
+      const f = x.op ? x.op.factores : x.factores;
+      const lado = x.op ? x.op.lado : x.lado;
+      const conFondo = mando && mando.direccionFondo !== 0 && lado === mando.direccionFondo;
+      const puntos = (pesoEvidencia ? pesoEvidencia(regla, marco, lado) : 0) * 10000
+        + peso[estado] * 1000 + (conFondo ? 100 : 0) + (f ? f.aFavor : 0) * 10 + k;
+      if (!mejor || puntos > mejor.puntos) mejor = { puntos, marco, regla, estado, ...x };
+    }
+  });
+  return mejor;
+}
+
+// Compara lo que el usuario ve (lado y precio) contra las zonas y operaciones del motor.
+export function compararIdea(lado, precio, e) {
+  let cerca = null;
+  for (const marco of [...e.operables].reverse()) {
+    const x = e.porMarco[marco].retroceso;
+    if (x.estado === 'en operación' && x.op.lado === lado) {
+      const o = x.op;
+      const riesgo = Math.abs(o.stop - precio);
+      const dentro = lado < 0 ? precio < o.stop && precio > o.objetivo1 : precio > o.stop && precio < o.objetivo1;
+      if (dentro) return { coincide: true, marco, tipo: 'operación', stop: o.stop, objetivo2: o.objetivo2, riesgoPct: 100 * riesgo / precio, paga: Math.abs(o.objetivo2 - precio) / riesgo };
+    }
+    if ((x.estado === 'preparando' || x.estado === 'en zona') && x.lado === lado) {
+      const riesgo = Math.abs(x.invalida - precio);
+      if (precio >= x.desde && precio <= x.hasta) {
+        return { coincide: true, marco, tipo: 'zona', desde: x.desde, hasta: x.hasta, stop: x.invalida, objetivo2: x.objetivo2, riesgoPct: 100 * riesgo / precio, paga: Math.abs(x.objetivo2 - precio) / riesgo };
+      }
+      const distancia = Math.min(Math.abs(precio - x.desde), Math.abs(precio - x.hasta));
+      if (!cerca || distancia < cerca.distancia) cerca = { marco, desde: x.desde, hasta: x.hasta, distancia };
+    }
+  }
+  return { coincide: false, cerca };
 }
 
 // ---------- Estado completo ----------
 
-export async function leerEstado({ simbolo = 'WLDUSDT', parametros, traer = fetch, ahora = Date.now() }) {
-  const P = parametros;
-  const nativas = {};
-  await Promise.all(Object.keys(NATIVAS).map(async marco => {
-    nativas[marco] = soloCerradas(await traerVelas(simbolo, marco, P.velas[marco], traer), ahora);
-  }));
-  const series = { ...nativas };
-  for (const [marco, [base, minutos]] of Object.entries(ARMADAS)) {
-    series[marco] = agrupar(nativas[base], NATIVAS[base], minutos);
-  }
+export async function leerEstado({ simbolo = 'WLDUSDT', parametros: P, traer = fetch, ahora = Date.now() }) {
+  const pedir = (s, m, n) => traerVelas(s, m, n, traer).then(v => soloCerradas(v, ahora));
+  const marcosW = Object.keys(NATIVAS);
+  const marcosB = Object.keys(P.velasBtc);
+  const [w, bt, extras] = await Promise.all([
+    Promise.all(marcosW.map(m => pedir(simbolo, m, P.velas[m]))),
+    Promise.all(marcosB.map(m => pedir('BTCUSDT', m, P.velasBtc[m]))).then(x => x, () => null),
+    traerExtras(simbolo, traer),
+  ]);
+  const series = armarTodas(Object.fromEntries(marcosW.map((m, k) => [m, w[k]])));
+  const btc = bt ? armarTodas(Object.fromEntries(marcosB.map((m, k) => [m, bt[k]]))) : {};
+  const precio = extras.precio ?? series['1m'].at(-1).c;
+
   const marcos = {};
   for (const m of MARCOS) marcos[m] = leerMarco(series[m], P.contexto);
 
-  // Volatilidad: ATR de 1 h como porcentaje del precio, contra sus últimos 90 días.
-  const rango1h = atr(series['1h'], P.volatilidad.atr).map((a, i) => (a == null ? null : 100 * a / series['1h'][i].c));
-  const lugar = percentil(rango1h.slice(-P.volatilidad.horas), rango1h.at(-1));
+  const prep = {};
+  const prepBtc = {};
+  for (const m of [...P.operables, '1w']) prep[m] = preparar(series[m], P.contexto);
+  for (const m of P.operables) if (btc[m]) prepBtc[m] = preparar(btc[m], P.contexto);
 
+  const porMarco = {};
+  const todas = [];
+  for (const m of P.operables) {
+    const r = simular(prep[m], m, P, { superior: prep[P.superior[m]], btc: prepBtc[m] });
+    porMarco[m] = r.vivo;
+    for (const o of r.ops) todas.push(o);
+  }
+  todas.sort((a, b) => b.t - a.t);
+
+  const lugar = lugarVolatilidad(prep['1h'], prep['1h'].velas.length - 1, { velas: P.volatilidad.horas });
+  const mando = quienManda(marcos, P.contexto);
   return {
     simbolo,
     hora: ahora,
-    precio: series['1m'].at(-1)?.c ?? null,
+    precio,
+    extras,
     marcos,
-    manda: quienManda(marcos, P.contexto),
+    mando,
     volatilidad: {
       percentil: lugar == null ? null : Math.round(lugar),
       operable: lugar != null && lugar >= P.volatilidad.minimo && lugar <= P.volatilidad.maximo,
     },
-    swing: zonaSwing(series['4h'], P.swing, P.contexto),
+    fase: leerFase(prep[P.fase.marco], P.fase),
+    btc: bt ? leerBtc(series, btc, P) : null,
+    mapa: mapaDelDia(series['1d'], series['1h'], precio, P.mapaDelDia, ahora),
+    operables: P.operables,
+    porMarco,
+    vigentes: todas.filter(o => o.estado === 'abierta'),
+    senales: todas.filter(o => o.estado === 'cerrada'),
+    principal: elegirPrincipal(porMarco, P.operables, ahora, mando),
   };
 }

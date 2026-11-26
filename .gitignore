@@ -1,4 +1,5 @@
 node_modules/
+datos/
 .DS_Store
 Thumbs.db
 desktop.ini

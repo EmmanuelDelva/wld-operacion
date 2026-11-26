@@ -1,63 +1,64 @@
-# Las cuatro reglas
+# Las reglas
 
-Las cuatro son hipótesis. Ninguna tiene ventaja demostrada todavía y cada una se valida por separado. Los números viven en `reglas/parametros.json`; aquí está lo mismo en palabras.
+Versión 2. Aquí nada bloquea: cada operación se muestra con sus factores a favor y con el resultado medido de su celda, que es la combinación de regla, temporalidad y lado. Los números viven en `reglas/parametros.json`.
 
-Todo se evalúa en velas cerradas. El costo de ida y vuelta se toma en 0.20 % y se repite la cuenta con 0.30 % como prueba de estrés.
+Todo se evalúa en velas cerradas. Las reglas corren por separado en ocho temporalidades: 15, 30 y 45 minutos; 1, 2, 3 y 4 horas; y 1 día. El costo de ida y vuelta, 0.20 %, se descuenta siempre.
 
-## Swing corto, la base
-
-| Paso | Regla |
-|---|---|
-| Régimen | En 4 h, EMA21 debajo de EMA50 y cierre debajo de EMA50. Si el diario apunta igual se anota como etiqueta, no es requisito. |
-| Volatilidad | El ATR de 1 h, como porcentaje del precio, entre el percentil 20 y el 97 de sus últimos 90 días. |
-| Zona | Abre entre la EMA21 de 4 h y lo que quede más abajo entre la EMA50 de 4 h y la EMA21 más 1 ATR de 4 h. La entrada ideal es el punto medio. |
-| Invalidación | El mayor entre el borde alto de la zona más 0.35 ATR de 4 h y la entrada ideal más 1.5 %. Ahí va el stop. |
-| Entrada en zona | Orden límite en la entrada ideal. Se cancela si el precio toca la invalidación antes de llenarse o si pasan 12 velas de 1 h. |
-| Entrada con confirmación | Después de tocar la zona, una vela de 1 h cierra bajo el mínimo de la vela anterior. Stop en el máximo del rebote más 0.25 ATR de 1 h, con distancia mínima de 1.5 %. |
-| Salida que se valida | Un solo objetivo a 2.5 R, que deje al menos 2 R netos. Vence a las 72 horas. |
-| Variante que se mide aparte | La mitad a 1.5 R sin mover el stop y la otra mitad con stop móvil por las últimas 4 velas de 4 h. |
-| Etiquetas | Diario alineado; razón de largos por corto de las cuentas grandes en 1.9 o más. |
-
-La entrada en zona y la entrada con confirmación corren en paralelo y se comparan.
-
-## Swing largo
-
-Es el espejo: en 4 h, cierre sobre EMA21 y EMA21 sobre EMA50; retroceso a la EMA21 de 4 h; confirmación con una vela de 1 h que cierra sobre el máximo de la anterior. Además pide tres cosas:
-
-- BTC alcista en 4 h, con cierre sobre su EMA50.
-- WLD más fuerte que BTC en las últimas 24 horas.
-- Funding en +0.03 % o menos.
-
-La distancia mínima del stop es 1.8 %. El RSI se anota como etiqueta.
-
-## Intradía corto, ruptura fallida
+## Retroceso en tendencia
 
 | Paso | Regla |
 |---|---|
-| Régimen | Cierre debajo de EMA50 en 1 h y en 4 h. |
-| Volatilidad | ATR de 15 m entre el percentil 20 y el 97 de sus últimos 90 días. |
-| Funding | Fuera de los 5 minutos antes y después del cobro. |
-| Barrido | El precio rebasa el máximo de las 20 velas previas de 15 m por al menos 0.1 ATR y, en 3 velas o menos, una cierra de vuelta abajo. |
-| Entrada | El primer precio ejecutable después de ese cierre. |
-| Stop | El máximo del barrido más 0.15 ATR de 15 m, con distancia mínima de 1.3 %. |
-| Salida que se valida | El borde bajo del rango de 20 velas, solo si deja 2 R netos o más. Vence a las 16 velas. |
-| Variante que se mide aparte | La mitad a 1.2 R y la otra mitad a 2.2 R. |
-| Etiqueta | Volumen bajo en el barrido. |
+| Régimen | En la propia temporalidad, EMA21 y EMA50 separadas al menos 0.30 ATR y el cierre del mismo lado de la EMA50. Debajo es corto; arriba es largo. |
+| Zona | Entre la EMA21 y la EMA50, con tope de 1 ATR contando desde la EMA21. La entrada ideal es el punto medio. |
+| Invalidación | El borde lejano de la zona más 0.35 ATR, con distancia mínima de 1 ATR desde la entrada ideal (1.25 ATR en 15 y 30 minutos). |
+| Entrada con confirmación | Después de tocar la zona, una vela cierra rompiendo el mínimo de la anterior, en cortos, o el máximo, en largos. Stop detrás del extremo del retroceso más 0.25 ATR. |
+| Entrada en zona | Orden límite en el punto medio, con stop en la invalidación. Se mide aparte. |
+| Objetivos | 1.5 R y 2.5 R. Vence a las 18 velas. |
 
-## Intradía largo
+## Ruptura fallida
 
-Es el espejo: barrido del mínimo de 20 velas y cierre de vuelta arriba en 3 velas o menos. Además pide 1 h alcista, BTC alcista en 1 h, WLD más fuerte que BTC en 4 horas y volumen relativo de 1.1 o más en la vela que recupera. Distancia mínima del stop: 1.3 %.
+| Paso | Regla |
+|---|---|
+| Barrido | El precio rebasa el extremo de las 20 velas previas por al menos 0.1 ATR y, en 3 velas o menos, una cierra de vuelta adentro. |
+| Entrada | Al cierre de esa vela, en contra del barrido. |
+| Stop | Detrás del extremo del barrido más 0.15 ATR, con el mismo mínimo en ATR. |
+| Objetivos | 1.2 R y 2.4 R. Vence a las 12 velas. |
 
-## Cómo se validan
+## Factores a favor
 
-1. **Descarte.** Una sola corrida sobre la historia ya explorada, hasta el 15 de septiembre de 2026. Pasa si el factor de ganancia es 1.20 o más con costo de 0.20 % y sigue arriba de 1.0 con 0.30 %, la expectativa es de +0.10 R o más, la peor racha no pasa de 12 R y hay al menos 100 operaciones.
-2. **Tramo limpio.** Una sola corrida del 16 de septiembre de 2026 a hoy. Solo detecta colapsos: la expectativa debe quedar arriba de −0.05 R y la peor racha no pasar de 6 R.
-3. **Libro en vivo.** A las 30 señales se detiene si va en −0.15 R o peor, o si la racha pasa de 8 R. A las 60, aprobación provisional con +0.12 R o más y factor de 1.25 o más, con tamaño chico. A las 100, juntando tramo limpio y nuevas, con al menos 30 nuevas, se confirma si el límite inferior del intervalo de confianza queda arriba de cero.
+Se cuentan, no bloquean:
 
-Una muestra insuficiente es resultado inconcluso, no aprobación. El código y los parámetros se sellan con una huella antes de abrir el tramo limpio; cualquier cambio posterior reinicia la validación.
+1. La temporalidad superior apunta igual.
+2. BTC apunta igual en esa misma temporalidad.
+3. La volatilidad está entre el percentil 20 y el 97.
+4. En retrocesos, la fuerza de la propia temporalidad va a favor. En rupturas fallidas, el barrido se hizo con volumen bajo.
 
-## Pendiente antes de sellar
+## Quién manda y fondo
 
-- Revisión del texto final por ChatGPT y Gemini.
-- El régimen del swing no pide una separación mínima entre EMA21 y EMA50: en un mercado plano puede cumplirse por un pelo. Las pruebas con datos fabricados lo mostraron. Falta decidir si se deja así, con la volatilidad como único filtro, o se pide una separación mínima.
-- «Quién manda» se definió como la temporalidad más alta con tendencia clara. Falta ver con datos reales si eso se queda pegado en la semanal.
+- **Quién manda:** hasta qué temporalidad llega, sin que aparezca una dirección contraria, el movimiento que nace en 15 minutos. Las temporalidades neutrales se saltan.
+- **Fondo:** la temporalidad más alta con tendencia clara.
+
+## Cómo se mide
+
+`pruebas/historia.mjs` baja toda la historia de Binance y corre las reglas una vez. Parte el resultado en dos: hasta el 15 de septiembre de 2026, que es historia ya explorada, y del 16 de septiembre en adelante. El resultado queda en `reglas/evidencia.json` y la app lo muestra junto a cada operación.
+
+Cada celda lleva una etiqueta:
+
+- **Muestra baja:** menos de 30 casos.
+- **Ventaja medida:** 100 casos o más, el piso del intervalo de confianza arriba de cero, sigue positiva con costo de 0.30 % y no se cae en el tramo reciente.
+- **A favor, por confirmar:** resultado neto positivo sin cumplir lo anterior.
+- **Sin ventaja:** resultado neto en cero o negativo.
+
+Si una vela toca el stop y el objetivo a la vez, se cuenta el stop.
+
+## Lo que salió en la primera medición
+
+Corrida del 25 de noviembre de 2026, con historia desde el 24 de julio de 2023.
+
+- De 48 celdas, ninguna alcanzó «ventaja medida».
+- Cuatro quedaron a favor, por confirmar; las cuatro son cortos de retroceso con confirmación: 3 h (+0.14 R en 178 casos), 2 h (+0.03 R en 262), 4 h (+0.03 R en 136) y 30 m (+0.01 R en 931).
+- Las rupturas fallidas salieron negativas en todas las temporalidades, salvo cortos de 1 D con muestra baja.
+- La entrada en zona sin confirmación rindió peor que esperar el cierre.
+- Los largos rindieron peor que los cortos.
+
+Son 48 comparaciones a la vez: alguna puede verse bien solo por azar. Lo que confirma o descarta una celda es lo que siga pasando con las señales nuevas.

@@ -1,0 +1,1775 @@
+{
+ "hecho": "2026-11-26T00:36:20.369Z",
+ "huella": "e1dd65187f115345",
+ "desde": "2023-07-24",
+ "corte": "2026-09-16",
+ "costoPct": 0.2,
+ "celdas": {
+  "zona|15m|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 2153,
+    "neto": -0.245,
+    "factor": 0.69,
+    "caida": 536.413,
+    "toco1": 34,
+    "objetivo2": 20,
+    "conEstres": -0.35,
+    "piso": -0.305
+   },
+   "limpio": {
+    "n": 147,
+    "neto": 0.01,
+    "factor": 1.015,
+    "caida": 11.896,
+    "toco1": 39,
+    "objetivo2": 27
+   },
+   "conTresOMas": {
+    "n": 966,
+    "neto": -0.196,
+    "factor": 0.743,
+    "caida": 192.063,
+    "toco1": 35,
+    "objetivo2": 20
+   },
+   "conMenos": {
+    "n": 1187,
+    "neto": -0.284,
+    "factor": 0.649,
+    "caida": 350.174,
+    "toco1": 34,
+    "objetivo2": 19
+   }
+  },
+  "zona|15m|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 1908,
+    "neto": -0.295,
+    "factor": 0.63,
+    "caida": 572.005,
+    "toco1": 33,
+    "objetivo2": 18,
+    "conEstres": -0.393,
+    "piso": -0.357
+   },
+   "limpio": {
+    "n": 110,
+    "neto": -0.253,
+    "factor": 0.661,
+    "caida": 42.546,
+    "toco1": 31,
+    "objetivo2": 19
+   },
+   "conTresOMas": {
+    "n": 917,
+    "neto": -0.304,
+    "factor": 0.611,
+    "caida": 284.726,
+    "toco1": 32,
+    "objetivo2": 17
+   },
+   "conMenos": {
+    "n": 991,
+    "neto": -0.287,
+    "factor": 0.647,
+    "caida": 289.615,
+    "toco1": 33,
+    "objetivo2": 19
+   }
+  },
+  "retroceso|15m|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 1803,
+    "neto": -0.103,
+    "factor": 0.836,
+    "caida": 200.424,
+    "toco1": 32,
+    "objetivo2": 16,
+    "conEstres": -0.184,
+    "piso": -0.163
+   },
+   "limpio": {
+    "n": 130,
+    "neto": -0.165,
+    "factor": 0.729,
+    "caida": 23.437,
+    "toco1": 34,
+    "objetivo2": 12
+   },
+   "conTresOMas": {
+    "n": 839,
+    "neto": -0.103,
+    "factor": 0.826,
+    "caida": 96.675,
+    "toco1": 29,
+    "objetivo2": 14
+   },
+   "conMenos": {
+    "n": 964,
+    "neto": -0.102,
+    "factor": 0.844,
+    "caida": 117.611,
+    "toco1": 35,
+    "objetivo2": 17
+   }
+  },
+  "retroceso|15m|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 1475,
+    "neto": -0.158,
+    "factor": 0.757,
+    "caida": 236.255,
+    "toco1": 29,
+    "objetivo2": 15,
+    "conEstres": -0.235,
+    "piso": -0.224
+   },
+   "limpio": {
+    "n": 80,
+    "neto": -0.149,
+    "factor": 0.773,
+    "caida": 16.362,
+    "toco1": 28,
+    "objetivo2": 15
+   },
+   "conTresOMas": {
+    "n": 733,
+    "neto": -0.175,
+    "factor": 0.721,
+    "caida": 132.16,
+    "toco1": 26,
+    "objetivo2": 13
+   },
+   "conMenos": {
+    "n": 742,
+    "neto": -0.141,
+    "factor": 0.791,
+    "caida": 121.688,
+    "toco1": 33,
+    "objetivo2": 18
+   }
+  },
+  "barrido|15m|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 3259,
+    "neto": -0.19,
+    "factor": 0.707,
+    "caida": 627.991,
+    "toco1": 37,
+    "objetivo2": 12,
+    "conEstres": -0.281,
+    "piso": -0.232
+   },
+   "limpio": {
+    "n": 199,
+    "neto": -0.111,
+    "factor": 0.816,
+    "caida": 33.361,
+    "toco1": 40,
+    "objetivo2": 13
+   },
+   "conTresOMas": {
+    "n": 339,
+    "neto": -0.309,
+    "factor": 0.545,
+    "caida": 119.943,
+    "toco1": 33,
+    "objetivo2": 9
+   },
+   "conMenos": {
+    "n": 2920,
+    "neto": -0.176,
+    "factor": 0.727,
+    "caida": 518.035,
+    "toco1": 37,
+    "objetivo2": 12
+   }
+  },
+  "barrido|15m|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 3400,
+    "neto": -0.242,
+    "factor": 0.637,
+    "caida": 823.566,
+    "toco1": 33,
+    "objetivo2": 12,
+    "conEstres": -0.332,
+    "piso": -0.282
+   },
+   "limpio": {
+    "n": 237,
+    "neto": -0.214,
+    "factor": 0.681,
+    "caida": 64.894,
+    "toco1": 36,
+    "objetivo2": 14
+   },
+   "conTresOMas": {
+    "n": 272,
+    "neto": -0.146,
+    "factor": 0.772,
+    "caida": 46.843,
+    "toco1": 38,
+    "objetivo2": 14
+   },
+   "conMenos": {
+    "n": 3128,
+    "neto": -0.251,
+    "factor": 0.626,
+    "caida": 783.869,
+    "toco1": 33,
+    "objetivo2": 11
+   }
+  },
+  "zona|30m|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 1125,
+    "neto": -0.175,
+    "factor": 0.764,
+    "caida": 209.385,
+    "toco1": 34,
+    "objetivo2": 20,
+    "conEstres": -0.248,
+    "piso": -0.258
+   },
+   "limpio": {
+    "n": 75,
+    "neto": -0.093,
+    "factor": 0.87,
+    "caida": 12.17,
+    "toco1": 39,
+    "objetivo2": 23
+   },
+   "conTresOMas": {
+    "n": 500,
+    "neto": -0.16,
+    "factor": 0.781,
+    "caida": 88.383,
+    "toco1": 32,
+    "objetivo2": 20
+   },
+   "conMenos": {
+    "n": 625,
+    "neto": -0.188,
+    "factor": 0.751,
+    "caida": 124.196,
+    "toco1": 35,
+    "objetivo2": 20
+   }
+  },
+  "zona|30m|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 924,
+    "neto": -0.204,
+    "factor": 0.728,
+    "caida": 200.505,
+    "toco1": 33,
+    "objetivo2": 20,
+    "conEstres": -0.271,
+    "piso": -0.295
+   },
+   "limpio": {
+    "n": 47,
+    "neto": 0.153,
+    "factor": 1.234,
+    "caida": 5.741,
+    "toco1": 47,
+    "objetivo2": 30
+   },
+   "conTresOMas": {
+    "n": 447,
+    "neto": -0.115,
+    "factor": 0.839,
+    "caida": 77.233,
+    "toco1": 35,
+    "objetivo2": 22
+   },
+   "conMenos": {
+    "n": 477,
+    "neto": -0.287,
+    "factor": 0.633,
+    "caida": 141.673,
+    "toco1": 31,
+    "objetivo2": 18
+   }
+  },
+  "retroceso|30m|corto": {
+   "etiqueta": "a favor, por confirmar",
+   "historia": {
+    "n": 931,
+    "neto": 0.011,
+    "factor": 1.018,
+    "caida": 37.113,
+    "toco1": 33,
+    "objetivo2": 18,
+    "conEstres": -0.045,
+    "piso": -0.075
+   },
+   "limpio": {
+    "n": 66,
+    "neto": -0.143,
+    "factor": 0.773,
+    "caida": 13.847,
+    "toco1": 27,
+    "objetivo2": 15
+   },
+   "conTresOMas": {
+    "n": 415,
+    "neto": 0.036,
+    "factor": 1.068,
+    "caida": 17.98,
+    "toco1": 30,
+    "objetivo2": 16
+   },
+   "conMenos": {
+    "n": 516,
+    "neto": -0.01,
+    "factor": 0.984,
+    "caida": 31.26,
+    "toco1": 36,
+    "objetivo2": 19
+   }
+  },
+  "retroceso|30m|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 723,
+    "neto": -0.096,
+    "factor": 0.847,
+    "caida": 76.841,
+    "toco1": 31,
+    "objetivo2": 16,
+    "conEstres": -0.149,
+    "piso": -0.192
+   },
+   "limpio": {
+    "n": 37,
+    "neto": 0.115,
+    "factor": 1.224,
+    "caida": 6.088,
+    "toco1": 43,
+    "objetivo2": 19
+   },
+   "conTresOMas": {
+    "n": 349,
+    "neto": -0.036,
+    "factor": 0.937,
+    "caida": 42.017,
+    "toco1": 32,
+    "objetivo2": 15
+   },
+   "conMenos": {
+    "n": 374,
+    "neto": -0.152,
+    "factor": 0.775,
+    "caida": 65.853,
+    "toco1": 29,
+    "objetivo2": 17
+   }
+  },
+  "barrido|30m|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 1643,
+    "neto": -0.104,
+    "factor": 0.826,
+    "caida": 192.353,
+    "toco1": 38,
+    "objetivo2": 13,
+    "conEstres": -0.167,
+    "piso": -0.164
+   },
+   "limpio": {
+    "n": 93,
+    "neto": -0.051,
+    "factor": 0.91,
+    "caida": 17.65,
+    "toco1": 41,
+    "objetivo2": 12
+   },
+   "conTresOMas": {
+    "n": 164,
+    "neto": -0.126,
+    "factor": 0.787,
+    "caida": 28.308,
+    "toco1": 32,
+    "objetivo2": 12
+   },
+   "conMenos": {
+    "n": 1479,
+    "neto": -0.102,
+    "factor": 0.831,
+    "caida": 168.116,
+    "toco1": 38,
+    "objetivo2": 13
+   }
+  },
+  "barrido|30m|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 1733,
+    "neto": -0.198,
+    "factor": 0.684,
+    "caida": 345.648,
+    "toco1": 33,
+    "objetivo2": 11,
+    "conEstres": -0.261,
+    "piso": -0.254
+   },
+   "limpio": {
+    "n": 116,
+    "neto": -0.221,
+    "factor": 0.668,
+    "caida": 39.051,
+    "toco1": 38,
+    "objetivo2": 12
+   },
+   "conTresOMas": {
+    "n": 128,
+    "neto": -0.037,
+    "factor": 0.932,
+    "caida": 18.676,
+    "toco1": 41,
+    "objetivo2": 13
+   },
+   "conMenos": {
+    "n": 1605,
+    "neto": -0.211,
+    "factor": 0.667,
+    "caida": 340.963,
+    "toco1": 33,
+    "objetivo2": 11
+   }
+  },
+  "zona|45m|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 797,
+    "neto": -0.265,
+    "factor": 0.676,
+    "caida": 212.468,
+    "toco1": 35,
+    "objetivo2": 21,
+    "conEstres": -0.339,
+    "piso": -0.365
+   },
+   "limpio": {
+    "n": 69,
+    "neto": -0.135,
+    "factor": 0.82,
+    "caida": 12.09,
+    "toco1": 39,
+    "objetivo2": 23
+   },
+   "conTresOMas": {
+    "n": 339,
+    "neto": -0.234,
+    "factor": 0.703,
+    "caida": 84.088,
+    "toco1": 36,
+    "objetivo2": 20
+   },
+   "conMenos": {
+    "n": 458,
+    "neto": -0.288,
+    "factor": 0.657,
+    "caida": 133.115,
+    "toco1": 35,
+    "objetivo2": 21
+   }
+  },
+  "zona|45m|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 646,
+    "neto": -0.276,
+    "factor": 0.662,
+    "caida": 188.067,
+    "toco1": 34,
+    "objetivo2": 21,
+    "conEstres": -0.342,
+    "piso": -0.387
+   },
+   "limpio": {
+    "n": 35,
+    "neto": -0.132,
+    "factor": 0.828,
+    "caida": 11.761,
+    "toco1": 34,
+    "objetivo2": 26
+   },
+   "conTresOMas": {
+    "n": 329,
+    "neto": -0.201,
+    "factor": 0.746,
+    "caida": 76.937,
+    "toco1": 36,
+    "objetivo2": 23
+   },
+   "conMenos": {
+    "n": 317,
+    "neto": -0.354,
+    "factor": 0.579,
+    "caida": 115.783,
+    "toco1": 32,
+    "objetivo2": 18
+   }
+  },
+  "retroceso|45m|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 621,
+    "neto": -0.03,
+    "factor": 0.95,
+    "caida": 35.372,
+    "toco1": 31,
+    "objetivo2": 17,
+    "conEstres": -0.076,
+    "piso": -0.135
+   },
+   "limpio": {
+    "n": 53,
+    "neto": -0.045,
+    "factor": 0.924,
+    "caida": 9.808,
+    "toco1": 32,
+    "objetivo2": 17
+   },
+   "conTresOMas": {
+    "n": 268,
+    "neto": 0.028,
+    "factor": 1.053,
+    "caida": 17.231,
+    "toco1": 29,
+    "objetivo2": 16
+   },
+   "conMenos": {
+    "n": 353,
+    "neto": -0.073,
+    "factor": 0.885,
+    "caida": 40.889,
+    "toco1": 33,
+    "objetivo2": 17
+   }
+  },
+  "retroceso|45m|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 474,
+    "neto": -0.098,
+    "factor": 0.845,
+    "caida": 50.989,
+    "toco1": 34,
+    "objetivo2": 17,
+    "conEstres": -0.141,
+    "piso": -0.218
+   },
+   "limpio": {
+    "n": 34,
+    "neto": 0.178,
+    "factor": 1.301,
+    "caida": 5.29,
+    "toco1": 38,
+    "objetivo2": 29
+   },
+   "conTresOMas": {
+    "n": 229,
+    "neto": 0.021,
+    "factor": 1.037,
+    "caida": 21.881,
+    "toco1": 31,
+    "objetivo2": 17
+   },
+   "conMenos": {
+    "n": 245,
+    "neto": -0.21,
+    "factor": 0.7,
+    "caida": 55.203,
+    "toco1": 36,
+    "objetivo2": 16
+   }
+  },
+  "barrido|45m|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 1184,
+    "neto": -0.137,
+    "factor": 0.793,
+    "caida": 174.594,
+    "toco1": 38,
+    "objetivo2": 16,
+    "conEstres": -0.197,
+    "piso": -0.211
+   },
+   "limpio": {
+    "n": 64,
+    "neto": 0.129,
+    "factor": 1.231,
+    "caida": 12.029,
+    "toco1": 50,
+    "objetivo2": 19
+   },
+   "conTresOMas": {
+    "n": 133,
+    "neto": -0.278,
+    "factor": 0.617,
+    "caida": 39.667,
+    "toco1": 31,
+    "objetivo2": 16
+   },
+   "conMenos": {
+    "n": 1051,
+    "neto": -0.12,
+    "factor": 0.817,
+    "caida": 141.417,
+    "toco1": 39,
+    "objetivo2": 16
+   }
+  },
+  "barrido|45m|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 1282,
+    "neto": -0.268,
+    "factor": 0.609,
+    "caida": 347.403,
+    "toco1": 35,
+    "objetivo2": 12,
+    "conEstres": -0.328,
+    "piso": -0.334
+   },
+   "limpio": {
+    "n": 87,
+    "neto": -0.465,
+    "factor": 0.414,
+    "caida": 47.871,
+    "toco1": 28,
+    "objetivo2": 10
+   },
+   "conTresOMas": {
+    "n": 101,
+    "neto": -0.345,
+    "factor": 0.512,
+    "caida": 34.829,
+    "toco1": 41,
+    "objetivo2": 13
+   },
+   "conMenos": {
+    "n": 1181,
+    "neto": -0.262,
+    "factor": 0.618,
+    "caida": 312.573,
+    "toco1": 35,
+    "objetivo2": 12
+   }
+  },
+  "zona|1h|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 633,
+    "neto": -0.287,
+    "factor": 0.645,
+    "caida": 188.921,
+    "toco1": 33,
+    "objetivo2": 19,
+    "conEstres": -0.351,
+    "piso": -0.397
+   },
+   "limpio": {
+    "n": 50,
+    "neto": 0.001,
+    "factor": 1.002,
+    "caida": 7.766,
+    "toco1": 40,
+    "objetivo2": 22
+   },
+   "conTresOMas": {
+    "n": 283,
+    "neto": -0.231,
+    "factor": 0.704,
+    "caida": 69.42,
+    "toco1": 35,
+    "objetivo2": 20
+   },
+   "conMenos": {
+    "n": 350,
+    "neto": -0.332,
+    "factor": 0.6,
+    "caida": 120.658,
+    "toco1": 31,
+    "objetivo2": 19
+   }
+  },
+  "zona|1h|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 487,
+    "neto": -0.261,
+    "factor": 0.675,
+    "caida": 131.048,
+    "toco1": 35,
+    "objetivo2": 21,
+    "conEstres": -0.316,
+    "piso": -0.389
+   },
+   "limpio": {
+    "n": 20,
+    "neto": -0.275,
+    "factor": 0.667,
+    "caida": 9.52,
+    "toco1": 30,
+    "objetivo2": 20
+   },
+   "conTresOMas": {
+    "n": 241,
+    "neto": -0.195,
+    "factor": 0.751,
+    "caida": 54.862,
+    "toco1": 39,
+    "objetivo2": 23
+   },
+   "conMenos": {
+    "n": 246,
+    "neto": -0.326,
+    "factor": 0.604,
+    "caida": 80.262,
+    "toco1": 31,
+    "objetivo2": 19
+   }
+  },
+  "retroceso|1h|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 483,
+    "neto": -0.069,
+    "factor": 0.882,
+    "caida": 50.151,
+    "toco1": 28,
+    "objetivo2": 16,
+    "conEstres": -0.111,
+    "piso": -0.184
+   },
+   "limpio": {
+    "n": 41,
+    "neto": -0.062,
+    "factor": 0.893,
+    "caida": 7.89,
+    "toco1": 37,
+    "objetivo2": 15
+   },
+   "conTresOMas": {
+    "n": 197,
+    "neto": -0.165,
+    "factor": 0.719,
+    "caida": 34.834,
+    "toco1": 24,
+    "objetivo2": 12
+   },
+   "conMenos": {
+    "n": 286,
+    "neto": -0.004,
+    "factor": 0.994,
+    "caida": 23.168,
+    "toco1": 31,
+    "objetivo2": 19
+   }
+  },
+  "retroceso|1h|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 351,
+    "neto": -0.042,
+    "factor": 0.932,
+    "caida": 34.729,
+    "toco1": 32,
+    "objetivo2": 20,
+    "conEstres": -0.078,
+    "piso": -0.187
+   },
+   "limpio": {
+    "n": 17,
+    "neto": -0.308,
+    "factor": 0.482,
+    "caida": 8.874,
+    "toco1": 24,
+    "objetivo2": 6
+   },
+   "conTresOMas": {
+    "n": 177,
+    "neto": 0.037,
+    "factor": 1.065,
+    "caida": 21.499,
+    "toco1": 32,
+    "objetivo2": 20
+   },
+   "conMenos": {
+    "n": 174,
+    "neto": -0.122,
+    "factor": 0.819,
+    "caida": 25.969,
+    "toco1": 32,
+    "objetivo2": 19
+   }
+  },
+  "barrido|1h|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 894,
+    "neto": -0.112,
+    "factor": 0.826,
+    "caida": 109.368,
+    "toco1": 40,
+    "objetivo2": 15,
+    "conEstres": -0.162,
+    "piso": -0.197
+   },
+   "limpio": {
+    "n": 51,
+    "neto": -0.111,
+    "factor": 0.826,
+    "caida": 16.113,
+    "toco1": 33,
+    "objetivo2": 14
+   },
+   "conTresOMas": {
+    "n": 101,
+    "neto": -0.118,
+    "factor": 0.815,
+    "caida": 20.19,
+    "toco1": 35,
+    "objetivo2": 15
+   },
+   "conMenos": {
+    "n": 793,
+    "neto": -0.111,
+    "factor": 0.827,
+    "caida": 106.183,
+    "toco1": 40,
+    "objetivo2": 15
+   }
+  },
+  "barrido|1h|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 962,
+    "neto": -0.214,
+    "factor": 0.675,
+    "caida": 206.609,
+    "toco1": 35,
+    "objetivo2": 13,
+    "conEstres": -0.263,
+    "piso": -0.291
+   },
+   "limpio": {
+    "n": 60,
+    "neto": -0.235,
+    "factor": 0.669,
+    "caida": 19.315,
+    "toco1": 32,
+    "objetivo2": 17
+   },
+   "conTresOMas": {
+    "n": 73,
+    "neto": -0.287,
+    "factor": 0.607,
+    "caida": 21.525,
+    "toco1": 45,
+    "objetivo2": 14
+   },
+   "conMenos": {
+    "n": 889,
+    "neto": -0.208,
+    "factor": 0.681,
+    "caida": 186.732,
+    "toco1": 34,
+    "objetivo2": 13
+   }
+  },
+  "zona|2h|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 347,
+    "neto": -0.146,
+    "factor": 0.804,
+    "caida": 55.176,
+    "toco1": 36,
+    "objetivo2": 22,
+    "conEstres": -0.192,
+    "piso": -0.301
+   },
+   "limpio": {
+    "n": 20,
+    "neto": 0.334,
+    "factor": 1.559,
+    "caida": 5.173,
+    "toco1": 45,
+    "objetivo2": 35
+   },
+   "conTresOMas": {
+    "n": 123,
+    "neto": -0.09,
+    "factor": 0.874,
+    "caida": 13.074,
+    "toco1": 41,
+    "objetivo2": 24
+   },
+   "conMenos": {
+    "n": 224,
+    "neto": -0.177,
+    "factor": 0.768,
+    "caida": 48.415,
+    "toco1": 33,
+    "objetivo2": 22
+   }
+  },
+  "zona|2h|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 226,
+    "neto": -0.279,
+    "factor": 0.649,
+    "caida": 78.304,
+    "toco1": 34,
+    "objetivo2": 19,
+    "conEstres": -0.315,
+    "piso": -0.462
+   },
+   "limpio": {
+    "n": 12,
+    "neto": -0.194,
+    "factor": 0.759,
+    "caida": 7.188,
+    "toco1": 25,
+    "objetivo2": 25
+   },
+   "conTresOMas": {
+    "n": 85,
+    "neto": -0.15,
+    "factor": 0.799,
+    "caida": 25.756,
+    "toco1": 39,
+    "objetivo2": 22
+   },
+   "conMenos": {
+    "n": 141,
+    "neto": -0.357,
+    "factor": 0.566,
+    "caida": 59.977,
+    "toco1": 30,
+    "objetivo2": 17
+   }
+  },
+  "retroceso|2h|corto": {
+   "etiqueta": "a favor, por confirmar",
+   "historia": {
+    "n": 262,
+    "neto": 0.029,
+    "factor": 1.055,
+    "caida": 17.024,
+    "toco1": 30,
+    "objetivo2": 15,
+    "conEstres": 0,
+    "piso": -0.126
+   },
+   "limpio": {
+    "n": 18,
+    "neto": 0.553,
+    "factor": 2.586,
+    "caida": 2.183,
+    "toco1": 56,
+    "objetivo2": 28
+   },
+   "conTresOMas": {
+    "n": 93,
+    "neto": -0.066,
+    "factor": 0.873,
+    "caida": 17.018,
+    "toco1": 20,
+    "objetivo2": 10
+   },
+   "conMenos": {
+    "n": 169,
+    "neto": 0.081,
+    "factor": 1.151,
+    "caida": 11.35,
+    "toco1": 36,
+    "objetivo2": 18
+   }
+  },
+  "retroceso|2h|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 168,
+    "neto": -0.19,
+    "factor": 0.716,
+    "caida": 44.834,
+    "toco1": 30,
+    "objetivo2": 15,
+    "conEstres": -0.213,
+    "piso": -0.387
+   },
+   "limpio": {
+    "n": 6,
+    "neto": -0.255,
+    "factor": 0.519,
+    "caida": 2.494,
+    "toco1": 33,
+    "objetivo2": 0
+   },
+   "conTresOMas": {
+    "n": 71,
+    "neto": -0.004,
+    "factor": 0.994,
+    "caida": 11.695,
+    "toco1": 31,
+    "objetivo2": 20
+   },
+   "conMenos": {
+    "n": 97,
+    "neto": -0.327,
+    "factor": 0.541,
+    "caida": 37.493,
+    "toco1": 29,
+    "objetivo2": 11
+   }
+  },
+  "barrido|2h|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 429,
+    "neto": -0.142,
+    "factor": 0.782,
+    "caida": 66.785,
+    "toco1": 36,
+    "objetivo2": 15,
+    "conEstres": -0.176,
+    "piso": -0.264
+   },
+   "limpio": {
+    "n": 20,
+    "neto": 0.131,
+    "factor": 1.223,
+    "caida": 5.19,
+    "toco1": 50,
+    "objetivo2": 25
+   },
+   "conTresOMas": {
+    "n": 43,
+    "neto": -0.026,
+    "factor": 0.956,
+    "caida": 10.024,
+    "toco1": 44,
+    "objetivo2": 14
+   },
+   "conMenos": {
+    "n": 386,
+    "neto": -0.155,
+    "factor": 0.764,
+    "caida": 66.959,
+    "toco1": 35,
+    "objetivo2": 15
+   }
+  },
+  "barrido|2h|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 479,
+    "neto": -0.186,
+    "factor": 0.716,
+    "caida": 96.729,
+    "toco1": 34,
+    "objetivo2": 13,
+    "conEstres": -0.221,
+    "piso": -0.298
+   },
+   "limpio": {
+    "n": 38,
+    "neto": -0.447,
+    "factor": 0.45,
+    "caida": 19.315,
+    "toco1": 29,
+    "objetivo2": 13
+   },
+   "conTresOMas": {
+    "n": 50,
+    "neto": -0.222,
+    "factor": 0.677,
+    "caida": 12.303,
+    "toco1": 32,
+    "objetivo2": 12
+   },
+   "conMenos": {
+    "n": 429,
+    "neto": -0.182,
+    "factor": 0.72,
+    "caida": 87.308,
+    "toco1": 34,
+    "objetivo2": 13
+   }
+  },
+  "zona|3h|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 235,
+    "neto": -0.055,
+    "factor": 0.924,
+    "caida": 41.431,
+    "toco1": 34,
+    "objetivo2": 23,
+    "conEstres": -0.092,
+    "piso": -0.248
+   },
+   "limpio": {
+    "n": 12,
+    "neto": 0.338,
+    "factor": 1.542,
+    "caida": 3.207,
+    "toco1": 42,
+    "objetivo2": 33
+   },
+   "conTresOMas": {
+    "n": 86,
+    "neto": 0.112,
+    "factor": 1.174,
+    "caida": 15.439,
+    "toco1": 42,
+    "objetivo2": 23
+   },
+   "conMenos": {
+    "n": 149,
+    "neto": -0.152,
+    "factor": 0.801,
+    "caida": 40.188,
+    "toco1": 30,
+    "objetivo2": 23
+   }
+  },
+  "zona|3h|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 144,
+    "neto": -0.173,
+    "factor": 0.767,
+    "caida": 35.882,
+    "toco1": 35,
+    "objetivo2": 22,
+    "conEstres": -0.202,
+    "piso": -0.409
+   },
+   "limpio": {
+    "n": 9,
+    "neto": -0.668,
+    "factor": 0.29,
+    "caida": 6.363,
+    "toco1": 11,
+    "objetivo2": 11
+   },
+   "conTresOMas": {
+    "n": 68,
+    "neto": -0.099,
+    "factor": 0.864,
+    "caida": 11.539,
+    "toco1": 38,
+    "objetivo2": 24
+   },
+   "conMenos": {
+    "n": 76,
+    "neto": -0.24,
+    "factor": 0.685,
+    "caida": 30.368,
+    "toco1": 32,
+    "objetivo2": 20
+   }
+  },
+  "retroceso|3h|corto": {
+   "etiqueta": "a favor, por confirmar",
+   "historia": {
+    "n": 178,
+    "neto": 0.144,
+    "factor": 1.284,
+    "caida": 8.245,
+    "toco1": 35,
+    "objetivo2": 17,
+    "conEstres": 0.122,
+    "piso": -0.054
+   },
+   "limpio": {
+    "n": 11,
+    "neto": 0.391,
+    "factor": 2.035,
+    "caida": 2.074,
+    "toco1": 27,
+    "objetivo2": 18
+   },
+   "conTresOMas": {
+    "n": 79,
+    "neto": 0.104,
+    "factor": 1.22,
+    "caida": 7.066,
+    "toco1": 32,
+    "objetivo2": 15
+   },
+   "conMenos": {
+    "n": 99,
+    "neto": 0.176,
+    "factor": 1.329,
+    "caida": 8.401,
+    "toco1": 37,
+    "objetivo2": 19
+   }
+  },
+  "retroceso|3h|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 98,
+    "neto": -0.037,
+    "factor": 0.935,
+    "caida": 20.718,
+    "toco1": 29,
+    "objetivo2": 17,
+    "conEstres": -0.054,
+    "piso": -0.301
+   },
+   "limpio": {
+    "n": 7,
+    "neto": -0.187,
+    "factor": 0.687,
+    "caida": 2.568,
+    "toco1": 29,
+    "objetivo2": 0
+   },
+   "conTresOMas": {
+    "n": 51,
+    "neto": -0.23,
+    "factor": 0.624,
+    "caida": 19.332,
+    "toco1": 22,
+    "objetivo2": 12
+   },
+   "conMenos": {
+    "n": 47,
+    "neto": 0.172,
+    "factor": 1.324,
+    "caida": 5.857,
+    "toco1": 36,
+    "objetivo2": 23
+   }
+  },
+  "barrido|3h|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 291,
+    "neto": -0.057,
+    "factor": 0.908,
+    "caida": 34.07,
+    "toco1": 37,
+    "objetivo2": 18,
+    "conEstres": -0.085,
+    "piso": -0.211
+   },
+   "limpio": {
+    "n": 13,
+    "neto": 0.622,
+    "factor": 2.921,
+    "caida": 3.164,
+    "toco1": 69,
+    "objetivo2": 23
+   },
+   "conTresOMas": {
+    "n": 20,
+    "neto": 0.054,
+    "factor": 1.093,
+    "caida": 5.324,
+    "toco1": 35,
+    "objetivo2": 20
+   },
+   "conMenos": {
+    "n": 271,
+    "neto": -0.065,
+    "factor": 0.896,
+    "caida": 36.428,
+    "toco1": 37,
+    "objetivo2": 17
+   }
+  },
+  "barrido|3h|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 326,
+    "neto": -0.257,
+    "factor": 0.605,
+    "caida": 85.8,
+    "toco1": 30,
+    "objetivo2": 11,
+    "conEstres": -0.285,
+    "piso": -0.382
+   },
+   "limpio": {
+    "n": 19,
+    "neto": -0.249,
+    "factor": 0.672,
+    "caida": 10.139,
+    "toco1": 26,
+    "objetivo2": 21
+   },
+   "conTresOMas": {
+    "n": 38,
+    "neto": -0.434,
+    "factor": 0.367,
+    "caida": 17.655,
+    "toco1": 29,
+    "objetivo2": 3
+   },
+   "conMenos": {
+    "n": 288,
+    "neto": -0.234,
+    "factor": 0.638,
+    "caida": 69.313,
+    "toco1": 30,
+    "objetivo2": 12
+   }
+  },
+  "zona|4h|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 176,
+    "neto": -0.182,
+    "factor": 0.761,
+    "caida": 45.624,
+    "toco1": 32,
+    "objetivo2": 20,
+    "conEstres": -0.213,
+    "piso": -0.397
+   },
+   "limpio": {
+    "n": 10,
+    "neto": -0.705,
+    "factor": 0.258,
+    "caida": 7.051,
+    "toco1": 10,
+    "objetivo2": 10
+   },
+   "conTresOMas": {
+    "n": 64,
+    "neto": 0.024,
+    "factor": 1.035,
+    "caida": 12.356,
+    "toco1": 41,
+    "objetivo2": 22
+   },
+   "conMenos": {
+    "n": 112,
+    "neto": -0.3,
+    "factor": 0.629,
+    "caida": 49.605,
+    "toco1": 27,
+    "objetivo2": 20
+   }
+  },
+  "zona|4h|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 108,
+    "neto": -0.181,
+    "factor": 0.754,
+    "caida": 26.518,
+    "toco1": 31,
+    "objetivo2": 21,
+    "conEstres": -0.204,
+    "piso": -0.452
+   },
+   "limpio": {
+    "n": 9,
+    "neto": 0.12,
+    "factor": 1.171,
+    "caida": 4.211,
+    "toco1": 33,
+    "objetivo2": 33
+   },
+   "conTresOMas": {
+    "n": 60,
+    "neto": -0.202,
+    "factor": 0.724,
+    "caida": 14.59,
+    "toco1": 27,
+    "objetivo2": 20
+   },
+   "conMenos": {
+    "n": 48,
+    "neto": -0.156,
+    "factor": 0.792,
+    "caida": 14.925,
+    "toco1": 35,
+    "objetivo2": 23
+   }
+  },
+  "retroceso|4h|corto": {
+   "etiqueta": "a favor, por confirmar",
+   "historia": {
+    "n": 136,
+    "neto": 0.026,
+    "factor": 1.052,
+    "caida": 10.123,
+    "toco1": 28,
+    "objetivo2": 14,
+    "conEstres": 0.007,
+    "piso": -0.182
+   },
+   "limpio": {
+    "n": 7,
+    "neto": 0.569,
+    "factor": 2.59,
+    "caida": 2.067,
+    "toco1": 29,
+    "objetivo2": 29
+   },
+   "conTresOMas": {
+    "n": 64,
+    "neto": 0.072,
+    "factor": 1.188,
+    "caida": 6.337,
+    "toco1": 23,
+    "objetivo2": 9
+   },
+   "conMenos": {
+    "n": 72,
+    "neto": -0.015,
+    "factor": 0.976,
+    "caida": 9.837,
+    "toco1": 32,
+    "objetivo2": 18
+   }
+  },
+  "retroceso|4h|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 68,
+    "neto": -0.011,
+    "factor": 0.98,
+    "caida": 13.679,
+    "toco1": 31,
+    "objetivo2": 18,
+    "conEstres": -0.026,
+    "piso": -0.325
+   },
+   "limpio": {
+    "n": 5,
+    "neto": 0.551,
+    "factor": 2.262,
+    "caida": 1.158,
+    "toco1": 40,
+    "objetivo2": 40
+   },
+   "conTresOMas": {
+    "n": 38,
+    "neto": -0.248,
+    "factor": 0.595,
+    "caida": 16.613,
+    "toco1": 26,
+    "objetivo2": 11
+   },
+   "conMenos": {
+    "n": 30,
+    "neto": 0.289,
+    "factor": 1.597,
+    "caida": 4.152,
+    "toco1": 37,
+    "objetivo2": 27
+   }
+  },
+  "barrido|4h|corto": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 211,
+    "neto": -0.203,
+    "factor": 0.701,
+    "caida": 51.217,
+    "toco1": 31,
+    "objetivo2": 11,
+    "conEstres": -0.227,
+    "piso": -0.372
+   },
+   "limpio": {
+    "n": 11,
+    "neto": 0.394,
+    "factor": 1.825,
+    "caida": 3.194,
+    "toco1": 45,
+    "objetivo2": 27
+   },
+   "conTresOMas": {
+    "n": 14,
+    "neto": -0.689,
+    "factor": 0.236,
+    "caida": 9.65,
+    "toco1": 21,
+    "objetivo2": 7
+   },
+   "conMenos": {
+    "n": 197,
+    "neto": -0.169,
+    "factor": 0.746,
+    "caida": 41.819,
+    "toco1": 32,
+    "objetivo2": 11
+   }
+  },
+  "barrido|4h|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 239,
+    "neto": -0.226,
+    "factor": 0.652,
+    "caida": 57.199,
+    "toco1": 35,
+    "objetivo2": 12,
+    "conEstres": -0.25,
+    "piso": -0.377
+   },
+   "limpio": {
+    "n": 19,
+    "neto": -0.303,
+    "factor": 0.621,
+    "caida": 10.756,
+    "toco1": 26,
+    "objetivo2": 21
+   },
+   "conTresOMas": {
+    "n": 32,
+    "neto": -0.36,
+    "factor": 0.498,
+    "caida": 14.007,
+    "toco1": 34,
+    "objetivo2": 13
+   },
+   "conMenos": {
+    "n": 207,
+    "neto": -0.205,
+    "factor": 0.679,
+    "caida": 44.394,
+    "toco1": 35,
+    "objetivo2": 12
+   }
+  },
+  "zona|1d|corto": {
+   "etiqueta": "muestra baja",
+   "historia": {
+    "n": 27,
+    "neto": -0.413,
+    "factor": 0.506,
+    "caida": 11.585,
+    "toco1": 26,
+    "objetivo2": 15,
+    "conEstres": -0.426,
+    "piso": -0.911
+   },
+   "limpio": {
+    "n": 0
+   },
+   "conTresOMas": {
+    "n": 5,
+    "neto": -0.322,
+    "factor": 0.606,
+    "caida": 3.06,
+    "toco1": 20,
+    "objetivo2": 20
+   },
+   "conMenos": {
+    "n": 22,
+    "neto": -0.433,
+    "factor": 0.484,
+    "caida": 9.973,
+    "toco1": 27,
+    "objetivo2": 14
+   }
+  },
+  "zona|1d|largo": {
+   "etiqueta": "muestra baja",
+   "historia": {
+    "n": 18,
+    "neto": 0.176,
+    "factor": 1.269,
+    "caida": 5.088,
+    "toco1": 33,
+    "objetivo2": 33,
+    "conEstres": 0.167,
+    "piso": -0.601
+   },
+   "limpio": {
+    "n": 1,
+    "neto": -0.684,
+    "factor": 0,
+    "caida": 0.684,
+    "toco1": 100,
+    "objetivo2": 0
+   },
+   "conTresOMas": {
+    "n": 6,
+    "neto": -0.432,
+    "factor": 0.49,
+    "caida": 4.066,
+    "toco1": 17,
+    "objetivo2": 17
+   },
+   "conMenos": {
+    "n": 12,
+    "neto": 0.48,
+    "factor": 1.865,
+    "caida": 3.051,
+    "toco1": 42,
+    "objetivo2": 42
+   }
+  },
+  "retroceso|1d|corto": {
+   "etiqueta": "muestra baja",
+   "historia": {
+    "n": 25,
+    "neto": -0.081,
+    "factor": 0.858,
+    "caida": 4.564,
+    "toco1": 24,
+    "objetivo2": 8,
+    "conEstres": -0.088,
+    "piso": -0.553
+   },
+   "limpio": {
+    "n": 0
+   },
+   "conTresOMas": {
+    "n": 5,
+    "neto": 0.409,
+    "factor": 3.018,
+    "caida": 1.014,
+    "toco1": 20,
+    "objetivo2": 0
+   },
+   "conMenos": {
+    "n": 20,
+    "neto": -0.203,
+    "factor": 0.693,
+    "caida": 5.676,
+    "toco1": 25,
+    "objetivo2": 10
+   }
+  },
+  "retroceso|1d|largo": {
+   "etiqueta": "muestra baja",
+   "historia": {
+    "n": 12,
+    "neto": 0.147,
+    "factor": 1.256,
+    "caida": 4.063,
+    "toco1": 33,
+    "objetivo2": 25,
+    "conEstres": 0.141,
+    "piso": -0.723
+   },
+   "limpio": {
+    "n": 2,
+    "neto": -0.428,
+    "factor": 0.156,
+    "caida": 1.015,
+    "toco1": 0,
+    "objetivo2": 0
+   },
+   "conTresOMas": {
+    "n": 3,
+    "neto": 0.51,
+    "factor": 2.596,
+    "caida": 0.959,
+    "toco1": 33,
+    "objetivo2": 33
+   },
+   "conMenos": {
+    "n": 9,
+    "neto": 0.025,
+    "factor": 1.039,
+    "caida": 4.063,
+    "toco1": 33,
+    "objetivo2": 22
+   }
+  },
+  "barrido|1d|corto": {
+   "etiqueta": "muestra baja",
+   "historia": {
+    "n": 29,
+    "neto": 0.086,
+    "factor": 1.16,
+    "caida": 5.096,
+    "toco1": 48,
+    "objetivo2": 17,
+    "conEstres": 0.077,
+    "piso": -0.399
+   },
+   "limpio": {
+    "n": 2,
+    "neto": 0.093,
+    "factor": 1.184,
+    "caida": 1.009,
+    "toco1": 50,
+    "objetivo2": 0
+   },
+   "conTresOMas": {
+    "n": 1,
+    "neto": -1.007,
+    "factor": 0,
+    "caida": 1.007,
+    "toco1": 0,
+    "objetivo2": 0
+   },
+   "conMenos": {
+    "n": 28,
+    "neto": 0.125,
+    "factor": 1.241,
+    "caida": 4.456,
+    "toco1": 50,
+    "objetivo2": 18
+   }
+  },
+  "barrido|1d|largo": {
+   "etiqueta": "sin ventaja",
+   "historia": {
+    "n": 30,
+    "neto": -0.278,
+    "factor": 0.599,
+    "caida": 15.534,
+    "toco1": 30,
+    "objetivo2": 17,
+    "conEstres": -0.287,
+    "piso": -0.731
+   },
+   "limpio": {
+    "n": 2,
+    "neto": -1.018,
+    "factor": 0,
+    "caida": 2.035,
+    "toco1": 0,
+    "objetivo2": 0
+   },
+   "conTresOMas": {
+    "n": 2,
+    "neto": -1.019,
+    "factor": 0,
+    "caida": 2.037,
+    "toco1": 0,
+    "objetivo2": 0
+   },
+   "conMenos": {
+    "n": 28,
+    "neto": -0.225,
+    "factor": 0.664,
+    "caida": 14.735,
+    "toco1": 32,
+    "objetivo2": 18
+   }
+  }
+ }
+}

@@ -1,29 +1,38 @@
 // Lee Binance desde esta computadora y muestra lo que el motor ve ahora mismo.
-//   node pruebas/estado.mjs            (WLDUSDT)
-//   node pruebas/estado.mjs BTCUSDT
+//   node pruebas/estado.mjs
 // Desde servidores en Estados Unidos Binance responde 451: hay que correrlo en tu propia máquina.
 import { readFile } from 'node:fs/promises';
 import { leerEstado, MARCOS } from '../motor/motor.js';
 
 const parametros = JSON.parse(await readFile(new URL('../reglas/parametros.json', import.meta.url), 'utf8'));
-const simbolo = process.argv[2] || 'WLDUSDT';
 const n = (x, d = 4) => (x == null ? '—' : x.toFixed(d));
+const L = l => (l < 0 ? 'corto' : 'largo');
 const inicio = Date.now();
-const e = await leerEstado({ simbolo, parametros });
+const e = await leerEstado({ simbolo: process.argv[2] || 'WLDUSDT', parametros });
 
 console.log(`${e.simbolo} · precio ${n(e.precio)} · ${new Date(e.hora).toISOString()} · ${Date.now() - inicio} ms`);
-console.log('marco  sesgo     fuerza  ADX    cierre   EMA21    EMA50    última vela (UTC)');
-for (const m of MARCOS) {
-  const x = e.marcos[m];
-  if (!x.listo) { console.log(`${m.padEnd(6)} faltan velas (${x.velas})`); continue; }
-  console.log([
-    m.padEnd(6), (x.sesgo + (x.contra ? '*' : '')).padEnd(9), String(x.fuerza).padStart(6), n(x.adx, 1).padStart(6),
-    n(x.cierre).padStart(8), n(x.emaRapida).padStart(8), n(x.emaLenta).padStart(8), ' ' + new Date(x.hora).toISOString().slice(0, 16),
-  ].join(' '));
+console.log(MARCOS.map(m => { const x = e.marcos[m]; return x.listo ? `${m} ${x.sesgo}${x.contra ? '*' : ''} ${x.fuerza}` : `${m} faltan velas`; }).join(' · '));
+console.log(`Manda: ${e.mando.manda ?? 'sin impulso en 15 m'} ${e.mando.manda ? (e.mando.direccion > 0 ? 'alcista' : 'bajista') : ''} · Fondo: ${e.mando.fondo ?? '—'} ${e.mando.fondo ? (e.mando.direccionFondo > 0 ? 'alcista' : 'bajista') : ''}`);
+console.log(`Funding ${n(e.extras.funding)} % · cuentas grandes ${n(e.extras.grandesCuentas, 2)} · volatilidad percentil ${e.volatilidad.percentil}`);
+const f = e.fase;
+console.log(f.clara ? `Fase ${f.lado < 0 ? 'bajista' : 'alcista'}: inició en ${n(f.inicio)}, final proyectado ${n(f.final)}, recorrido ${f.recorrido} %` : `Sin fase clara: rango ${n(f.piso)} a ${n(f.techo)}`);
+if (e.btc) console.log(`BTC: 1d ${e.btc.marcos['1d'].sesgo} · 4h ${e.btc.marcos['4h'].sesgo} · 1h ${e.btc.marcos['1h'].sesgo} · WLD contra BTC 24 h ${n(e.btc.diferencia, 2)} % · correlación ${n(e.btc.correlacion, 2)}`);
+const m = e.mapa;
+console.log(`Día: apertura ${n(m.apertura)} · máx ${n(m.maximo)} · mín ${n(m.minimo)} · techo probable ${n(m.techo)} · piso probable ${n(m.piso)}`);
+console.log('   ' + m.bloques.map(b => `${b.horas} ${b.estado}${b.cambio != null ? ' ' + n(b.cambio, 1) + ' %' : ''} (${b.sesgo}${b.sesgo !== 'sin sesgo' ? ' ' + b.frecuencia + ' % de ' + b.dias : ''})`).join(' · '));
+console.log('Por temporalidad:');
+for (const marco of e.operables) {
+  const x = e.porMarco[marco];
+  const partes = [];
+  for (const regla of ['zona', 'retroceso', 'barrido']) {
+    const s = x[regla];
+    if (s.estado === 'en operación') partes.push(`${regla}: ${L(s.op.lado)} confirmado, entrada ${n(s.op.entrada)} → objetivo 2 ${n(s.op.objetivo2)}, stop ${n(s.op.stop)}, a favor ${s.op.factores.aFavor} de ${s.op.factores.de}`);
+    else if (s.estado === 'preparando' || s.estado === 'en zona') partes.push(`${regla}: ${L(s.lado)} ${s.estado}, abre entre ${n(s.desde)} y ${n(s.hasta)}, se invalida en ${n(s.invalida)}`);
+    else if (s.estado === 'barrido en curso') partes.push(`barrido en curso (${L(s.lado)}), nivel ${n(s.nivel)}`);
+  }
+  console.log(`  ${marco.padEnd(4)} ${partes.join(' | ') || 'sin operación'}`);
 }
-console.log('* la fuerza va contra el sesgo de fondo');
-console.log(`Manda: ${e.manda ?? 'ninguna con tendencia clara'}`);
-console.log(`Volatilidad: percentil ${e.volatilidad.percentil} · ${e.volatilidad.operable ? 'operable' : 'fuera de rango'}`);
-const z = e.swing;
-if (!z.lado) console.log(`Swing: sin zona (${z.motivo})`);
-else console.log(`Swing ${z.lado}: abre entre ${n(z.desde)} y ${n(z.hasta)} · ideal ${n(z.ideal)} · se invalida en ${n(z.invalida)} (${n(z.riesgoPct, 2)} %) · objetivo 1 ${n(z.objetivo1)} · objetivo 2 ${n(z.objetivo2)} · precio en zona: ${z.precioEnZona ? 'sí' : 'no'}`);
+const p = e.principal;
+console.log(p ? `Principal: ${p.regla} ${p.marco} · ${p.estado}` : 'Principal: ninguna');
+console.log(`Vigentes: ${e.vigentes.length} · señales cerradas en el periodo cargado: ${e.senales.length}`);
+for (const o of e.senales.slice(0, 5)) console.log(`  ${new Date(o.t).toISOString().slice(0, 16)} ${o.marco} ${o.regla} ${L(o.lado)} ${n(o.entrada)} → ${n(o.salida)} ${o.motivo} ${n(o.neto, 2)} R`);
