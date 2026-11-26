@@ -107,9 +107,11 @@ const etiquetar = (h, piso, estres, limpio) => {
   return h.neto > 0 ? 'a favor, por confirmar' : 'sin ventaja';
 };
 // Francotirador: idea en el macro, disparo en 15 m.
+const opsTirador = {};
 for (const m of P.tirador.marcos) {
   const { ops } = simularTirador(prep['15m'], prep[m], m, P, { superior: prep[P.superior[m]], btc: prepBtc[m] });
   conFunding(ops);
+  opsTirador[m] = ops;
   for (const lado of [-1, 1]) {
     const grupo = ops.filter(o => o.lado === lado && o.estado === 'cerrada' && o.g.fin && o.finRecorrido);
     const antes = grupo.filter(o => o.t < corte);
@@ -163,6 +165,123 @@ for (const m of P.operables) {
   }
 }
 
+// ---------- Búsqueda de alta efectividad ----------
+// Mismo trato para todas: primero el stop si una vela toca los dos, costo y funding descontados,
+// y «acierto» es terminar con resultado neto positivo.
+const v15 = prep['15m'].velas;
+const p4 = prep['4h'];
+function salida(i0, lado, entrada, stop, objetivo, vence) {
+  const fin = Math.min(v15.length - 1, i0 + vence - 1);
+  for (let i = i0; i <= fin; i++) {
+    const b = v15[i];
+    if (lado < 0 ? b.h >= stop : b.l <= stop) return { r: -Math.abs(stop - entrada), i };
+    if (lado < 0 ? b.l <= objetivo : b.h >= objetivo) return { r: Math.abs(objetivo - entrada), i };
+  }
+  return { r: lado * (v15[fin].c - entrada), i: fin };
+}
+function operar(lado, tEntrada, entrada, stop, objetivo, i0, vence) {
+  const s = salida(i0, lado, entrada, stop, objetivo, vence);
+  const fundingPct = -lado * (acumulado[hasta(v15[s.i].fin)] - acumulado[hasta(tEntrada)]) * 100;
+  return { t: tEntrada, iFin: s.i, netoPct: 100 * s.r / entrada - P.costos.idaYVueltaPct + fundingPct, stopPct: 100 * Math.abs(stop - entrada) / entrada };
+}
+function medir(lista) {
+  const f = xs => {
+    if (!xs.length) return { n: 0 };
+    let racha = 0, peor = 0;
+    for (const x of xs) { racha = x.netoPct > 0 ? 0 : racha + 1; peor = Math.max(peor, racha); }
+    return {
+      n: xs.length,
+      aciertos: Math.round(100 * xs.filter(x => x.netoPct > 0).length / xs.length),
+      netoPct: +(xs.reduce((a, x) => a + x.netoPct, 0) / xs.length).toFixed(3),
+      netoR: +(xs.reduce((a, x) => a + x.netoPct / x.stopPct, 0) / xs.length).toFixed(3),
+      perdidasSeguidas: peor,
+    };
+  };
+  return { historia: f(lista.filter(x => x.t < corte)), limpio: f(lista.filter(x => x.t >= corte)) };
+}
+
+// 1. Rejilla de salidas sobre las entradas de francotirador.
+const rejilla = {};
+for (const m of P.tirador.marcos) {
+  for (const lado of [-1, 1]) {
+    const ops = opsTirador[m].filter(o => o.lado === lado);
+    for (const tipo of ['disparo', 'macro']) {
+      for (const mult of [0.33, 0.5, 0.75, 1]) {
+        rejilla[`${m}|${lado < 0 ? 'corto' : 'largo'}|stop ${tipo}|objetivo ${mult}`] = medir(ops.map(o => {
+          const d = tipo === 'disparo' ? o.riesgo : Math.max(o.riesgo, Math.abs(o.invalidaMacro - o.entrada));
+          return operar(lado, o.t, o.entrada, o.entrada - lado * d, o.entrada + lado * mult * d, o.i + 1, o.vence);
+        }));
+      }
+    }
+  }
+}
+
+// 2. Regla de ChatGPT: corto por agresión compradora fallida.
+function reglaChatGPT() {
+  const lista = [];
+  const L = p4.lenta;
+  let libre = 0, j = -1;
+  for (let i = 60; i < v15.length - 1; i++) {
+    const b = v15[i];
+    while (j + 1 < p4.velas.length && p4.velas[j + 1].fin <= b.fin) j++;
+    if (i < libre || j < 55) continue;
+    if (!(b.c < L[j] && L[j] < L[j - 1] && L[j - 1] < L[j - 2] && L[j - 2] < L[j - 3])) continue;
+    let alto = -Infinity, vol = 0;
+    for (let k = i - 5; k < i; k++) alto = Math.max(alto, v15[k].h);
+    for (let k = i - 20; k < i; k++) vol += v15[k].v;
+    const rango = b.h - b.l;
+    if (!(b.h > alto && b.v >= 1.5 * vol / 20 && b.tb / b.v >= 0.6 && rango > 0 && b.h - Math.max(b.o, b.c) >= 0.5 * rango && b.c < v15[i - 1].c)) continue;
+    const e = v15[i + 1].o;
+    const r = operar(-1, v15[i + 1].t, e, e * 1.015, e * 0.991, i + 1, 16);
+    lista.push(r);
+    libre = r.iFin + 1;
+  }
+  return medir(lista);
+}
+
+// 3. Regla de Gemini: corto en ruptura fallida de 15 m con funding no negativo.
+function reglaGemini() {
+  const lista = [];
+  let libre = 0, j = -1;
+  for (let i = 60; i < v15.length - 1; i++) {
+    const b = v15[i];
+    while (j + 1 < p4.velas.length && p4.velas[j + 1].fin <= b.fin) j++;
+    if (i < libre || j < 55 || !(p4.c[j] < p4.lenta[j])) continue;
+    const k = hasta(b.fin) - 1;
+    if (k < 0 || funding[k][1] < 0) continue;
+    let alto = -Infinity;
+    for (let q = i - 20; q < i; q++) alto = Math.max(alto, v15[q].h);
+    if (!(b.h > alto && b.c < alto && b.tb / b.v < 0.5)) continue;
+    const r = operar(-1, b.fin, b.c, b.c * 1.03, b.c * 0.985, i + 1, 96);
+    lista.push(r);
+    libre = r.iFin + 1;
+  }
+  return medir(lista);
+}
+
+// 4. Idea de Gemini: corto por agotamiento tras un salto extremo, en 4 h.
+function agotamiento() {
+  const v4 = p4.velas;
+  const lista = [];
+  let libre = 0;
+  for (let j = 30; j < v4.length; j++) {
+    const b = v4[j];
+    const a = p4.rango[j];
+    let bajo = Infinity, vol = 0;
+    for (let q = j - 6; q < j; q++) bajo = Math.min(bajo, v4[q].l);
+    for (let q = j - 20; q < j; q++) vol += v4[q].v;
+    if (!(b.h - bajo >= 2.5 * a && b.c < (b.h + b.l) / 2 && b.v > 1.5 * vol / 20)) continue;
+    let lo = 0, hi = v15.length;
+    while (lo < hi) { const m = (lo + hi) >> 1; if (v15[m].t > b.fin) hi = m; else lo = m + 1; }
+    if (lo >= v15.length || lo < libre) continue;
+    const r = operar(-1, b.fin, b.c, b.h + 0.5 * a, b.c - 1.5 * a, lo, 12 * 16);
+    lista.push(r);
+    libre = r.iFin + 1;
+  }
+  return medir(lista);
+}
+const altaEfectividad = { rejilla, chatgpt: reglaChatGPT(), gemini: reglaGemini(), agotamiento: agotamiento() };
+
 const evidencia = {
   hecho: new Date().toISOString(),
   huella: createHash('sha256').update(textoMotor).update(textoParametros).digest('hex').slice(0, 16),
@@ -171,6 +290,7 @@ const evidencia = {
   costoPct: P.costos.idaYVueltaPct,
   funding: 'incluido',
   celdas,
+  altaEfectividad,
 };
 await writeFile(new URL('reglas/evidencia.json', raiz), JSON.stringify(evidencia, null, 1));
 
@@ -184,3 +304,10 @@ for (const [k, c] of Object.entries(celdas).sort((x, y) => (y[1].historia.neto ?
     String(c.limpio.n).padStart(6), n(c.limpio.neto).padStart(7), '|', n(c.conTresOMas.neto).padStart(6), String(c.conTresOMas.n).padStart(5), '|', c.etiqueta,
   ].join(' '));
 }
+
+console.log('\nAlta efectividad (aciertos %, neto % del precio, neto en R del stop usado, pérdidas seguidas | tramo reciente):');
+const linea = (k, x) => console.log(`AE ${k.padEnd(40)} n ${String(x.historia.n).padStart(4)} · ${String(x.historia.aciertos ?? '—').padStart(3)} % · ${String(x.historia.netoPct ?? '—').padStart(7)} % · ${String(x.historia.netoR ?? '—').padStart(7)} R · ${x.historia.perdidasSeguidas ?? '—'} | n ${x.limpio.n} · ${x.limpio.aciertos ?? '—'} % · ${x.limpio.netoPct ?? '—'} %`);
+for (const [k, x] of Object.entries(rejilla)) if (/^(3h|4h|1d)\|corto/.test(k) || (x.historia.aciertos >= 75 && x.historia.netoPct > 0)) linea(k, x);
+linea('ChatGPT: agresión compradora fallida', altaEfectividad.chatgpt);
+linea('Gemini: ruptura fallida con funding', altaEfectividad.gemini);
+linea('Gemini: agotamiento tras un salto', altaEfectividad.agotamiento);

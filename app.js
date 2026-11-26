@@ -155,13 +155,24 @@ function tarjetaOpcion(titulo, p) {
   }
   const celda = EV && EV.celdas[`${p.regla}|${p.marco}|${lado < 0 ? 'corto' : 'largo'}`];
   const rec = celda && celda.recorrido && celda.historia.n ? `<div class="lab" style="padding-top:4px">De ${celda.historia.n} casos, antes del stop llegó a +1 R el ${celda.recorrido[1]} %, a +2 R el ${celda.recorrido[2]} % y a +3 R el ${celda.recorrido[3]} %.</div>` : '';
+  // Salida corta de alta efectividad: stop en la invalidación del macro y objetivo a un tercio de esa distancia.
+  const ae = EV && EV.altaEfectividad && p.regla === 'tirador' ? EV.altaEfectividad.rejilla[`${p.marco}|${lado < 0 ? 'corto' : 'largo'}|stop macro|objetivo 0.33`] : null;
+  let alta = '';
+  if (ae && ae.historia.n) {
+    let niveles = '';
+    if (op && op.invalidaMacro != null) {
+      const d = Math.max(op.riesgo, Math.abs(op.invalidaMacro - op.entrada));
+      niveles = ` En esta operación: objetivo <span class="num">${n(op.entrada + lado * 0.33 * d)}</span> y stop <span class="num">${n(op.entrada - lado * d)}</span>.`;
+    }
+    alta = `<div class="lab" style="padding-top:4px">Salida corta (stop en la invalidación del macro, objetivo a un tercio de esa distancia): acertó ${ae.historia.aciertos} % en ${ae.historia.n} casos, con ${pct(ae.historia.netoPct)} neto por operación${ae.limpio.n ? `; desde ${EV.corte}, ${ae.limpio.aciertos} % en ${ae.limpio.n} casos, con ${pct(ae.limpio.netoPct)}` : ''}. Una pérdida borra unas cuatro ganancias.${niveles}</div>`;
+  }
   return `<div class="p">
     <div class="fila"><div class="lab">${titulo}</div>${fondo}<span class="chip">a favor ${f ? `${f.aFavor} de ${f.de}` : '—'}</span></div>
     <div class="estado" style="font-size:22px">${palabra}</div>
     <div class="${color(lado)}" style="padding:2px 0 8px">${frase}</div>
     ${escalera(partes)}
     ${nota ? `<div class="lab" style="padding-top:6px">${nota}</div>` : ''}
-    <div class="lab ${ev.clase}" style="padding-top:6px">Evidencia en ${tf}: ${ev.texto}</div>${rec}</div>`;
+    <div class="lab ${ev.clase}" style="padding-top:6px">Evidencia en ${tf}: ${ev.texto}</div>${rec}${alta}</div>`;
 }
 
 // Macro y micro: alineados o no, y dónde salir si se va contra el macro.

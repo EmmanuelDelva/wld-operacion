@@ -99,3 +99,23 @@ Corrida del 25 de noviembre de 2026, historia desde el 24 de julio de 2023, con 
 - Solo dos de cada diez operaciones llegan al objetivo. Las rachas de pérdidas son largas: con 1 % de riesgo por operación, una racha de 25 R es una caída de 25 %.
 
 Toda la historia hasta el 25 de noviembre de 2026 ya se usó para diseñar o medir. Lo que confirme o descarte estas reglas son las señales nuevas.
+
+## Búsqueda de alta efectividad
+
+Emmanuel pidió una regla con 75 % a 80 % de aciertos o más. Se midieron cuatro caminos en una sola corrida, con el mismo trato: stop primero si una vela toca los dos, costo de 0.20 % y funding descontados, y «acierto» es terminar con resultado neto positivo.
+
+| Camino | Casos | Aciertos | Neto por operación | Del 16 de septiembre en adelante |
+|---|---|---|---|---|
+| Francotirador, corto con macro de 4 h, stop en la invalidación del macro y objetivo a un tercio de esa distancia | 308 | 81 % | +0.28 % | 19 casos, 68 %, −0.60 % |
+| Lo mismo con macro de 3 h | 358 | 80 % | +0.32 % | 26 casos, 62 %, −0.84 % |
+| Lo mismo con macro de 4 h y objetivo a la mitad | 308 | 73 % | +0.45 % | 19 casos, 68 %, +0.06 % |
+| Lo mismo con macro de 4 h y objetivo a tres cuartos | 308 | 64 % | +0.63 % | 19 casos, 63 %, +0.51 % |
+| Francotirador con el stop corto del disparo y objetivo a un tercio | 308 a 358 | 79 % a 80 % | −0.05 % a −0.08 % | |
+| Regla de ChatGPT: corto por agresión compradora fallida | 13 | 54 % | −0.41 % | 1 caso |
+| Regla de Gemini: corto en ruptura fallida con funding no negativo | 577 | 68 % | −0.10 % | 24 casos, 71 %, −0.01 % |
+| Idea de Gemini: corto por agotamiento tras un salto | 154 | 45 % | −0.61 % | 13 casos, 38 %, −0.63 % |
+
+- Sí hay una salida con 80 % de aciertos y resultado positivo en la historia: stop ancho y objetivo corto sobre las entradas de francotirador de 3 h y 4 h. El margen es delgado, porque una pérdida borra unas cuatro ganancias, y en el tramo reciente no se sostuvo.
+- Con el stop corto del disparo también se acierta 80 %, pero el costo se come la ganancia.
+- Llegar a 90 % pediría un objetivo todavía más corto; con costo de 0.20 % la ganancia por acierto quedaría por debajo de lo que cuesta una sola pérdida entre diez.
+- Con el mismo disparo, subir el objetivo baja los aciertos y sube lo que deja cada operación.

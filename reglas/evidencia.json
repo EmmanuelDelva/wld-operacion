@@ -1,6 +1,6 @@
 {
- "hecho": "2026-11-26T01:12:10.549Z",
- "huella": "6131c79d6c42eb85",
+ "hecho": "2026-11-26T01:25:36.917Z",
+ "huella": "f58d85a26b187c2a",
  "desde": "2023-07-24",
  "corte": "2026-09-16",
  "costoPct": 0.2,
@@ -2445,6 +2445,1306 @@
     "caida": 14.797,
     "toco1": 32,
     "objetivo2": 18
+   }
+  }
+ },
+ "altaEfectividad": {
+  "rejilla": {
+   "1h|corto|stop disparo|objetivo 0.33": {
+    "historia": {
+     "n": 516,
+     "aciertos": 72,
+     "netoPct": -0.296,
+     "netoR": -0.175,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 41,
+     "aciertos": 80,
+     "netoPct": -0.093,
+     "netoR": -0.059,
+     "perdidasSeguidas": 2
+    }
+   },
+   "1h|corto|stop disparo|objetivo 0.5": {
+    "historia": {
+     "n": 516,
+     "aciertos": 63,
+     "netoPct": -0.299,
+     "netoR": -0.181,
+     "perdidasSeguidas": 7
+    },
+    "limpio": {
+     "n": 41,
+     "aciertos": 71,
+     "netoPct": -0.093,
+     "netoR": -0.069,
+     "perdidasSeguidas": 2
+    }
+   },
+   "1h|corto|stop disparo|objetivo 0.75": {
+    "historia": {
+     "n": 516,
+     "aciertos": 54,
+     "netoPct": -0.293,
+     "netoR": -0.185,
+     "perdidasSeguidas": 7
+    },
+    "limpio": {
+     "n": 41,
+     "aciertos": 63,
+     "netoPct": -0.014,
+     "netoR": -0.02,
+     "perdidasSeguidas": 4
+    }
+   },
+   "1h|corto|stop disparo|objetivo 1": {
+    "historia": {
+     "n": 516,
+     "aciertos": 46,
+     "netoPct": -0.312,
+     "netoR": -0.205,
+     "perdidasSeguidas": 12
+    },
+    "limpio": {
+     "n": 41,
+     "aciertos": 59,
+     "netoPct": 0.072,
+     "netoR": 0.032,
+     "perdidasSeguidas": 4
+    }
+   },
+   "1h|corto|stop macro|objetivo 0.33": {
+    "historia": {
+     "n": 516,
+     "aciertos": 71,
+     "netoPct": -0.364,
+     "netoR": -0.115,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 41,
+     "aciertos": 71,
+     "netoPct": -0.253,
+     "netoR": -0.098,
+     "perdidasSeguidas": 4
+    }
+   },
+   "1h|corto|stop macro|objetivo 0.5": {
+    "historia": {
+     "n": 516,
+     "aciertos": 63,
+     "netoPct": -0.312,
+     "netoR": -0.094,
+     "perdidasSeguidas": 7
+    },
+    "limpio": {
+     "n": 41,
+     "aciertos": 66,
+     "netoPct": -0.187,
+     "netoR": -0.042,
+     "perdidasSeguidas": 4
+    }
+   },
+   "1h|corto|stop macro|objetivo 0.75": {
+    "historia": {
+     "n": 516,
+     "aciertos": 56,
+     "netoPct": -0.229,
+     "netoR": -0.069,
+     "perdidasSeguidas": 7
+    },
+    "limpio": {
+     "n": 41,
+     "aciertos": 56,
+     "netoPct": -0.218,
+     "netoR": -0.042,
+     "perdidasSeguidas": 4
+    }
+   },
+   "1h|corto|stop macro|objetivo 1": {
+    "historia": {
+     "n": 516,
+     "aciertos": 49,
+     "netoPct": -0.244,
+     "netoR": -0.084,
+     "perdidasSeguidas": 12
+    },
+    "limpio": {
+     "n": 41,
+     "aciertos": 49,
+     "netoPct": -0.356,
+     "netoR": -0.095,
+     "perdidasSeguidas": 4
+    }
+   },
+   "1h|largo|stop disparo|objetivo 0.33": {
+    "historia": {
+     "n": 360,
+     "aciertos": 77,
+     "netoPct": -0.194,
+     "netoR": -0.103,
+     "perdidasSeguidas": 3
+    },
+    "limpio": {
+     "n": 21,
+     "aciertos": 76,
+     "netoPct": -0.124,
+     "netoR": -0.111,
+     "perdidasSeguidas": 2
+    }
+   },
+   "1h|largo|stop disparo|objetivo 0.5": {
+    "historia": {
+     "n": 360,
+     "aciertos": 67,
+     "netoPct": -0.228,
+     "netoR": -0.123,
+     "perdidasSeguidas": 6
+    },
+    "limpio": {
+     "n": 21,
+     "aciertos": 67,
+     "netoPct": -0.177,
+     "netoR": -0.124,
+     "perdidasSeguidas": 2
+    }
+   },
+   "1h|largo|stop disparo|objetivo 0.75": {
+    "historia": {
+     "n": 360,
+     "aciertos": 58,
+     "netoPct": -0.21,
+     "netoR": -0.112,
+     "perdidasSeguidas": 6
+    },
+    "limpio": {
+     "n": 21,
+     "aciertos": 62,
+     "netoPct": 0.016,
+     "netoR": -0.041,
+     "perdidasSeguidas": 4
+    }
+   },
+   "1h|largo|stop disparo|objetivo 1": {
+    "historia": {
+     "n": 360,
+     "aciertos": 53,
+     "netoPct": -0.119,
+     "netoR": -0.063,
+     "perdidasSeguidas": 7
+    },
+    "limpio": {
+     "n": 21,
+     "aciertos": 48,
+     "netoPct": -0.216,
+     "netoR": -0.172,
+     "perdidasSeguidas": 4
+    }
+   },
+   "1h|largo|stop macro|objetivo 0.33": {
+    "historia": {
+     "n": 360,
+     "aciertos": 74,
+     "netoPct": -0.3,
+     "netoR": -0.073,
+     "perdidasSeguidas": 5
+    },
+    "limpio": {
+     "n": 21,
+     "aciertos": 67,
+     "netoPct": -0.581,
+     "netoR": -0.156,
+     "perdidasSeguidas": 2
+    }
+   },
+   "1h|largo|stop macro|objetivo 0.5": {
+    "historia": {
+     "n": 360,
+     "aciertos": 66,
+     "netoPct": -0.211,
+     "netoR": -0.062,
+     "perdidasSeguidas": 5
+    },
+    "limpio": {
+     "n": 21,
+     "aciertos": 67,
+     "netoPct": -0.209,
+     "netoR": -0.043,
+     "perdidasSeguidas": 2
+    }
+   },
+   "1h|largo|stop macro|objetivo 0.75": {
+    "historia": {
+     "n": 360,
+     "aciertos": 59,
+     "netoPct": -0.13,
+     "netoR": -0.037,
+     "perdidasSeguidas": 7
+    },
+    "limpio": {
+     "n": 21,
+     "aciertos": 52,
+     "netoPct": -0.456,
+     "netoR": -0.143,
+     "perdidasSeguidas": 4
+    }
+   },
+   "1h|largo|stop macro|objetivo 1": {
+    "historia": {
+     "n": 360,
+     "aciertos": 52,
+     "netoPct": -0.096,
+     "netoR": -0.033,
+     "perdidasSeguidas": 7
+    },
+    "limpio": {
+     "n": 21,
+     "aciertos": 48,
+     "netoPct": -0.344,
+     "netoR": -0.125,
+     "perdidasSeguidas": 4
+    }
+   },
+   "2h|corto|stop disparo|objetivo 0.33": {
+    "historia": {
+     "n": 452,
+     "aciertos": 73,
+     "netoPct": -0.261,
+     "netoR": -0.159,
+     "perdidasSeguidas": 5
+    },
+    "limpio": {
+     "n": 34,
+     "aciertos": 65,
+     "netoPct": -0.43,
+     "netoR": -0.267,
+     "perdidasSeguidas": 2
+    }
+   },
+   "2h|corto|stop disparo|objetivo 0.5": {
+    "historia": {
+     "n": 452,
+     "aciertos": 67,
+     "netoPct": -0.198,
+     "netoR": -0.122,
+     "perdidasSeguidas": 6
+    },
+    "limpio": {
+     "n": 34,
+     "aciertos": 53,
+     "netoPct": -0.543,
+     "netoR": -0.334,
+     "perdidasSeguidas": 5
+    }
+   },
+   "2h|corto|stop disparo|objetivo 0.75": {
+    "historia": {
+     "n": 452,
+     "aciertos": 57,
+     "netoPct": -0.215,
+     "netoR": -0.132,
+     "perdidasSeguidas": 6
+    },
+    "limpio": {
+     "n": 34,
+     "aciertos": 50,
+     "netoPct": -0.403,
+     "netoR": -0.253,
+     "perdidasSeguidas": 5
+    }
+   },
+   "2h|corto|stop disparo|objetivo 1": {
+    "historia": {
+     "n": 452,
+     "aciertos": 51,
+     "netoPct": -0.153,
+     "netoR": -0.112,
+     "perdidasSeguidas": 6
+    },
+    "limpio": {
+     "n": 34,
+     "aciertos": 47,
+     "netoPct": -0.359,
+     "netoR": -0.21,
+     "perdidasSeguidas": 5
+    }
+   },
+   "2h|corto|stop macro|objetivo 0.33": {
+    "historia": {
+     "n": 452,
+     "aciertos": 75,
+     "netoPct": -0.015,
+     "netoR": -0.031,
+     "perdidasSeguidas": 6
+    },
+    "limpio": {
+     "n": 34,
+     "aciertos": 68,
+     "netoPct": -0.464,
+     "netoR": -0.133,
+     "perdidasSeguidas": 4
+    }
+   },
+   "2h|corto|stop macro|objetivo 0.5": {
+    "historia": {
+     "n": 452,
+     "aciertos": 67,
+     "netoPct": 0.046,
+     "netoR": -0.016,
+     "perdidasSeguidas": 6
+    },
+    "limpio": {
+     "n": 34,
+     "aciertos": 68,
+     "netoPct": -0.018,
+     "netoR": -0.024,
+     "perdidasSeguidas": 4
+    }
+   },
+   "2h|corto|stop macro|objetivo 0.75": {
+    "historia": {
+     "n": 452,
+     "aciertos": 54,
+     "netoPct": -0.094,
+     "netoR": -0.066,
+     "perdidasSeguidas": 11
+    },
+    "limpio": {
+     "n": 34,
+     "aciertos": 65,
+     "netoPct": 0.411,
+     "netoR": 0.095,
+     "perdidasSeguidas": 4
+    }
+   },
+   "2h|corto|stop macro|objetivo 1": {
+    "historia": {
+     "n": 452,
+     "aciertos": 49,
+     "netoPct": 0.003,
+     "netoR": -0.043,
+     "perdidasSeguidas": 11
+    },
+    "limpio": {
+     "n": 34,
+     "aciertos": 65,
+     "netoPct": 0.974,
+     "netoR": 0.241,
+     "perdidasSeguidas": 4
+    }
+   },
+   "2h|largo|stop disparo|objetivo 0.33": {
+    "historia": {
+     "n": 281,
+     "aciertos": 73,
+     "netoPct": -0.255,
+     "netoR": -0.144,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 13,
+     "aciertos": 77,
+     "netoPct": -0.155,
+     "netoR": -0.083,
+     "perdidasSeguidas": 1
+    }
+   },
+   "2h|largo|stop disparo|objetivo 0.5": {
+    "historia": {
+     "n": 281,
+     "aciertos": 63,
+     "netoPct": -0.259,
+     "netoR": -0.165,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 13,
+     "aciertos": 77,
+     "netoPct": 0.111,
+     "netoR": 0.048,
+     "perdidasSeguidas": 1
+    }
+   },
+   "2h|largo|stop disparo|objetivo 0.75": {
+    "historia": {
+     "n": 281,
+     "aciertos": 55,
+     "netoPct": -0.221,
+     "netoR": -0.151,
+     "perdidasSeguidas": 5
+    },
+    "limpio": {
+     "n": 13,
+     "aciertos": 54,
+     "netoPct": -0.148,
+     "netoR": -0.164,
+     "perdidasSeguidas": 2
+    }
+   },
+   "2h|largo|stop disparo|objetivo 1": {
+    "historia": {
+     "n": 281,
+     "aciertos": 48,
+     "netoPct": -0.193,
+     "netoR": -0.143,
+     "perdidasSeguidas": 7
+    },
+    "limpio": {
+     "n": 13,
+     "aciertos": 46,
+     "netoPct": -0.104,
+     "netoR": -0.183,
+     "perdidasSeguidas": 2
+    }
+   },
+   "2h|largo|stop macro|objetivo 0.33": {
+    "historia": {
+     "n": 281,
+     "aciertos": 71,
+     "netoPct": -0.428,
+     "netoR": -0.096,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 13,
+     "aciertos": 77,
+     "netoPct": 0.132,
+     "netoR": -0.029,
+     "perdidasSeguidas": 1
+    }
+   },
+   "2h|largo|stop macro|objetivo 0.5": {
+    "historia": {
+     "n": 281,
+     "aciertos": 62,
+     "netoPct": -0.389,
+     "netoR": -0.095,
+     "perdidasSeguidas": 6
+    },
+    "limpio": {
+     "n": 13,
+     "aciertos": 46,
+     "netoPct": -0.86,
+     "netoR": -0.361,
+     "perdidasSeguidas": 4
+    }
+   },
+   "2h|largo|stop macro|objetivo 0.75": {
+    "historia": {
+     "n": 281,
+     "aciertos": 54,
+     "netoPct": -0.316,
+     "netoR": -0.079,
+     "perdidasSeguidas": 10
+    },
+    "limpio": {
+     "n": 13,
+     "aciertos": 46,
+     "netoPct": -0.199,
+     "netoR": -0.246,
+     "perdidasSeguidas": 4
+    }
+   },
+   "2h|largo|stop macro|objetivo 1": {
+    "historia": {
+     "n": 281,
+     "aciertos": 45,
+     "netoPct": -0.721,
+     "netoR": -0.137,
+     "perdidasSeguidas": 10
+    },
+    "limpio": {
+     "n": 13,
+     "aciertos": 46,
+     "netoPct": 0.106,
+     "netoR": -0.176,
+     "perdidasSeguidas": 4
+    }
+   },
+   "3h|corto|stop disparo|objetivo 0.33": {
+    "historia": {
+     "n": 358,
+     "aciertos": 79,
+     "netoPct": -0.08,
+     "netoR": -0.075,
+     "perdidasSeguidas": 3
+    },
+    "limpio": {
+     "n": 26,
+     "aciertos": 73,
+     "netoPct": -0.202,
+     "netoR": -0.148,
+     "perdidasSeguidas": 2
+    }
+   },
+   "3h|corto|stop disparo|objetivo 0.5": {
+    "historia": {
+     "n": 358,
+     "aciertos": 72,
+     "netoPct": -0.03,
+     "netoR": -0.05,
+     "perdidasSeguidas": 5
+    },
+    "limpio": {
+     "n": 26,
+     "aciertos": 65,
+     "netoPct": -0.163,
+     "netoR": -0.139,
+     "perdidasSeguidas": 3
+    }
+   },
+   "3h|corto|stop disparo|objetivo 0.75": {
+    "historia": {
+     "n": 358,
+     "aciertos": 61,
+     "netoPct": -0.028,
+     "netoR": -0.052,
+     "perdidasSeguidas": 5
+    },
+    "limpio": {
+     "n": 26,
+     "aciertos": 50,
+     "netoPct": -0.397,
+     "netoR": -0.245,
+     "perdidasSeguidas": 4
+    }
+   },
+   "3h|corto|stop disparo|objetivo 1": {
+    "historia": {
+     "n": 358,
+     "aciertos": 56,
+     "netoPct": 0.085,
+     "netoR": 0.001,
+     "perdidasSeguidas": 5
+    },
+    "limpio": {
+     "n": 26,
+     "aciertos": 46,
+     "netoPct": -0.301,
+     "netoR": -0.198,
+     "perdidasSeguidas": 4
+    }
+   },
+   "3h|corto|stop macro|objetivo 0.33": {
+    "historia": {
+     "n": 358,
+     "aciertos": 80,
+     "netoPct": 0.321,
+     "netoR": 0.028,
+     "perdidasSeguidas": 3
+    },
+    "limpio": {
+     "n": 26,
+     "aciertos": 62,
+     "netoPct": -0.838,
+     "netoR": -0.188,
+     "perdidasSeguidas": 4
+    }
+   },
+   "3h|corto|stop macro|objetivo 0.5": {
+    "historia": {
+     "n": 358,
+     "aciertos": 70,
+     "netoPct": 0.39,
+     "netoR": 0.021,
+     "perdidasSeguidas": 5
+    },
+    "limpio": {
+     "n": 26,
+     "aciertos": 58,
+     "netoPct": -0.623,
+     "netoR": -0.148,
+     "perdidasSeguidas": 4
+    }
+   },
+   "3h|corto|stop macro|objetivo 0.75": {
+    "historia": {
+     "n": 358,
+     "aciertos": 61,
+     "netoPct": 0.36,
+     "netoR": 0.032,
+     "perdidasSeguidas": 9
+    },
+    "limpio": {
+     "n": 26,
+     "aciertos": 54,
+     "netoPct": -0.112,
+     "netoR": -0.042,
+     "perdidasSeguidas": 4
+    }
+   },
+   "3h|corto|stop macro|objetivo 1": {
+    "historia": {
+     "n": 358,
+     "aciertos": 55,
+     "netoPct": 0.376,
+     "netoR": 0.042,
+     "perdidasSeguidas": 9
+    },
+    "limpio": {
+     "n": 26,
+     "aciertos": 50,
+     "netoPct": 0.151,
+     "netoR": 0.004,
+     "perdidasSeguidas": 4
+    }
+   },
+   "3h|largo|stop disparo|objetivo 0.33": {
+    "historia": {
+     "n": 217,
+     "aciertos": 74,
+     "netoPct": -0.202,
+     "netoR": -0.113,
+     "perdidasSeguidas": 2
+    },
+    "limpio": {
+     "n": 17,
+     "aciertos": 82,
+     "netoPct": -0.071,
+     "netoR": -0.009,
+     "perdidasSeguidas": 1
+    }
+   },
+   "3h|largo|stop disparo|objetivo 0.5": {
+    "historia": {
+     "n": 217,
+     "aciertos": 66,
+     "netoPct": -0.18,
+     "netoR": -0.105,
+     "perdidasSeguidas": 2
+    },
+    "limpio": {
+     "n": 17,
+     "aciertos": 71,
+     "netoPct": -0.202,
+     "netoR": -0.046,
+     "perdidasSeguidas": 1
+    }
+   },
+   "3h|largo|stop disparo|objetivo 0.75": {
+    "historia": {
+     "n": 217,
+     "aciertos": 57,
+     "netoPct": -0.187,
+     "netoR": -0.109,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 17,
+     "aciertos": 59,
+     "netoPct": -0.146,
+     "netoR": -0.075,
+     "perdidasSeguidas": 2
+    }
+   },
+   "3h|largo|stop disparo|objetivo 1": {
+    "historia": {
+     "n": 217,
+     "aciertos": 52,
+     "netoPct": -0.065,
+     "netoR": -0.06,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 17,
+     "aciertos": 47,
+     "netoPct": -0.25,
+     "netoR": -0.164,
+     "perdidasSeguidas": 3
+    }
+   },
+   "3h|largo|stop macro|objetivo 0.33": {
+    "historia": {
+     "n": 217,
+     "aciertos": 75,
+     "netoPct": 0.088,
+     "netoR": -0.031,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 17,
+     "aciertos": 65,
+     "netoPct": -0.741,
+     "netoR": -0.143,
+     "perdidasSeguidas": 3
+    }
+   },
+   "3h|largo|stop macro|objetivo 0.5": {
+    "historia": {
+     "n": 217,
+     "aciertos": 67,
+     "netoPct": 0.176,
+     "netoR": -0.013,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 17,
+     "aciertos": 59,
+     "netoPct": -0.498,
+     "netoR": -0.122,
+     "perdidasSeguidas": 5
+    }
+   },
+   "3h|largo|stop macro|objetivo 0.75": {
+    "historia": {
+     "n": 217,
+     "aciertos": 57,
+     "netoPct": 0.163,
+     "netoR": -0.007,
+     "perdidasSeguidas": 6
+    },
+    "limpio": {
+     "n": 17,
+     "aciertos": 59,
+     "netoPct": 0.448,
+     "netoR": 0.025,
+     "perdidasSeguidas": 5
+    }
+   },
+   "3h|largo|stop macro|objetivo 1": {
+    "historia": {
+     "n": 217,
+     "aciertos": 51,
+     "netoPct": 0.197,
+     "netoR": 0.008,
+     "perdidasSeguidas": 11
+    },
+    "limpio": {
+     "n": 17,
+     "aciertos": 41,
+     "netoPct": -0.423,
+     "netoR": -0.182,
+     "perdidasSeguidas": 8
+    }
+   },
+   "4h|corto|stop disparo|objetivo 0.33": {
+    "historia": {
+     "n": 308,
+     "aciertos": 80,
+     "netoPct": -0.047,
+     "netoR": -0.055,
+     "perdidasSeguidas": 3
+    },
+    "limpio": {
+     "n": 19,
+     "aciertos": 79,
+     "netoPct": -0.036,
+     "netoR": -0.057,
+     "perdidasSeguidas": 2
+    }
+   },
+   "4h|corto|stop disparo|objetivo 0.5": {
+    "historia": {
+     "n": 308,
+     "aciertos": 72,
+     "netoPct": -0.029,
+     "netoR": -0.045,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 19,
+     "aciertos": 74,
+     "netoPct": 0.09,
+     "netoR": -0.003,
+     "perdidasSeguidas": 3
+    }
+   },
+   "4h|corto|stop disparo|objetivo 0.75": {
+    "historia": {
+     "n": 308,
+     "aciertos": 63,
+     "netoPct": 0.019,
+     "netoR": -0.024,
+     "perdidasSeguidas": 7
+    },
+    "limpio": {
+     "n": 19,
+     "aciertos": 58,
+     "netoPct": -0.212,
+     "netoR": -0.096,
+     "perdidasSeguidas": 3
+    }
+   },
+   "4h|corto|stop disparo|objetivo 1": {
+    "historia": {
+     "n": 308,
+     "aciertos": 56,
+     "netoPct": 0.086,
+     "netoR": -0.003,
+     "perdidasSeguidas": 8
+    },
+    "limpio": {
+     "n": 19,
+     "aciertos": 47,
+     "netoPct": -0.341,
+     "netoR": -0.162,
+     "perdidasSeguidas": 5
+    }
+   },
+   "4h|corto|stop macro|objetivo 0.33": {
+    "historia": {
+     "n": 308,
+     "aciertos": 81,
+     "netoPct": 0.283,
+     "netoR": 0.038,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 19,
+     "aciertos": 68,
+     "netoPct": -0.598,
+     "netoR": -0.135,
+     "perdidasSeguidas": 5
+    }
+   },
+   "4h|corto|stop macro|objetivo 0.5": {
+    "historia": {
+     "n": 308,
+     "aciertos": 73,
+     "netoPct": 0.449,
+     "netoR": 0.073,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 19,
+     "aciertos": 68,
+     "netoPct": 0.059,
+     "netoR": -0.035,
+     "perdidasSeguidas": 5
+    }
+   },
+   "4h|corto|stop macro|objetivo 0.75": {
+    "historia": {
+     "n": 308,
+     "aciertos": 64,
+     "netoPct": 0.625,
+     "netoR": 0.09,
+     "perdidasSeguidas": 6
+    },
+    "limpio": {
+     "n": 19,
+     "aciertos": 63,
+     "netoPct": 0.507,
+     "netoR": 0.015,
+     "perdidasSeguidas": 5
+    }
+   },
+   "4h|corto|stop macro|objetivo 1": {
+    "historia": {
+     "n": 308,
+     "aciertos": 54,
+     "netoPct": 0.427,
+     "netoR": 0.032,
+     "perdidasSeguidas": 7
+    },
+    "limpio": {
+     "n": 19,
+     "aciertos": 63,
+     "netoPct": 1.349,
+     "netoR": 0.146,
+     "perdidasSeguidas": 5
+    }
+   },
+   "4h|largo|stop disparo|objetivo 0.33": {
+    "historia": {
+     "n": 167,
+     "aciertos": 74,
+     "netoPct": -0.228,
+     "netoR": -0.116,
+     "perdidasSeguidas": 3
+    },
+    "limpio": {
+     "n": 16,
+     "aciertos": 75,
+     "netoPct": -0.233,
+     "netoR": -0.103,
+     "perdidasSeguidas": 2
+    }
+   },
+   "4h|largo|stop disparo|objetivo 0.5": {
+    "historia": {
+     "n": 167,
+     "aciertos": 65,
+     "netoPct": -0.285,
+     "netoR": -0.125,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 16,
+     "aciertos": 69,
+     "netoPct": -0.254,
+     "netoR": -0.07,
+     "perdidasSeguidas": 2
+    }
+   },
+   "4h|largo|stop disparo|objetivo 0.75": {
+    "historia": {
+     "n": 167,
+     "aciertos": 54,
+     "netoPct": -0.316,
+     "netoR": -0.153,
+     "perdidasSeguidas": 5
+    },
+    "limpio": {
+     "n": 16,
+     "aciertos": 63,
+     "netoPct": -0.051,
+     "netoR": -0.007,
+     "perdidasSeguidas": 3
+    }
+   },
+   "4h|largo|stop disparo|objetivo 1": {
+    "historia": {
+     "n": 167,
+     "aciertos": 47,
+     "netoPct": -0.276,
+     "netoR": -0.15,
+     "perdidasSeguidas": 8
+    },
+    "limpio": {
+     "n": 16,
+     "aciertos": 63,
+     "netoPct": 0.28,
+     "netoR": 0.149,
+     "perdidasSeguidas": 3
+    }
+   },
+   "4h|largo|stop macro|objetivo 0.33": {
+    "historia": {
+     "n": 167,
+     "aciertos": 72,
+     "netoPct": -0.184,
+     "netoR": -0.061,
+     "perdidasSeguidas": 5
+    },
+    "limpio": {
+     "n": 16,
+     "aciertos": 88,
+     "netoPct": 1.294,
+     "netoR": 0.132,
+     "perdidasSeguidas": 2
+    }
+   },
+   "4h|largo|stop macro|objetivo 0.5": {
+    "historia": {
+     "n": 167,
+     "aciertos": 63,
+     "netoPct": -0.227,
+     "netoR": -0.071,
+     "perdidasSeguidas": 11
+    },
+    "limpio": {
+     "n": 16,
+     "aciertos": 75,
+     "netoPct": 1.29,
+     "netoR": 0.092,
+     "perdidasSeguidas": 4
+    }
+   },
+   "4h|largo|stop macro|objetivo 0.75": {
+    "historia": {
+     "n": 167,
+     "aciertos": 54,
+     "netoPct": -0.084,
+     "netoR": -0.047,
+     "perdidasSeguidas": 11
+    },
+    "limpio": {
+     "n": 16,
+     "aciertos": 50,
+     "netoPct": 0.41,
+     "netoR": -0.158,
+     "perdidasSeguidas": 7
+    }
+   },
+   "4h|largo|stop macro|objetivo 1": {
+    "historia": {
+     "n": 167,
+     "aciertos": 49,
+     "netoPct": 0.202,
+     "netoR": -0.025,
+     "perdidasSeguidas": 16
+    },
+    "limpio": {
+     "n": 16,
+     "aciertos": 50,
+     "netoPct": 1.523,
+     "netoR": -0.034,
+     "perdidasSeguidas": 7
+    }
+   },
+   "1d|corto|stop disparo|objetivo 0.33": {
+    "historia": {
+     "n": 76,
+     "aciertos": 74,
+     "netoPct": -0.239,
+     "netoR": -0.122,
+     "perdidasSeguidas": 2
+    },
+    "limpio": {
+     "n": 0
+    }
+   },
+   "1d|corto|stop disparo|objetivo 0.5": {
+    "historia": {
+     "n": 76,
+     "aciertos": 62,
+     "netoPct": -0.304,
+     "netoR": -0.174,
+     "perdidasSeguidas": 3
+    },
+    "limpio": {
+     "n": 0
+    }
+   },
+   "1d|corto|stop disparo|objetivo 0.75": {
+    "historia": {
+     "n": 76,
+     "aciertos": 57,
+     "netoPct": -0.158,
+     "netoR": -0.111,
+     "perdidasSeguidas": 3
+    },
+    "limpio": {
+     "n": 0
+    }
+   },
+   "1d|corto|stop disparo|objetivo 1": {
+    "historia": {
+     "n": 76,
+     "aciertos": 51,
+     "netoPct": -0.111,
+     "netoR": -0.074,
+     "perdidasSeguidas": 3
+    },
+    "limpio": {
+     "n": 0
+    }
+   },
+   "1d|corto|stop macro|objetivo 0.33": {
+    "historia": {
+     "n": 76,
+     "aciertos": 67,
+     "netoPct": -0.694,
+     "netoR": -0.125,
+     "perdidasSeguidas": 8
+    },
+    "limpio": {
+     "n": 0
+    }
+   },
+   "1d|corto|stop macro|objetivo 0.5": {
+    "historia": {
+     "n": 76,
+     "aciertos": 61,
+     "netoPct": -0.346,
+     "netoR": -0.109,
+     "perdidasSeguidas": 9
+    },
+    "limpio": {
+     "n": 0
+    }
+   },
+   "1d|corto|stop macro|objetivo 0.75": {
+    "historia": {
+     "n": 76,
+     "aciertos": 57,
+     "netoPct": 0.528,
+     "netoR": -0.033,
+     "perdidasSeguidas": 9
+    },
+    "limpio": {
+     "n": 0
+    }
+   },
+   "1d|corto|stop macro|objetivo 1": {
+    "historia": {
+     "n": 76,
+     "aciertos": 49,
+     "netoPct": 0.891,
+     "netoR": -0.053,
+     "perdidasSeguidas": 10
+    },
+    "limpio": {
+     "n": 0
+    }
+   },
+   "1d|largo|stop disparo|objetivo 0.33": {
+    "historia": {
+     "n": 68,
+     "aciertos": 74,
+     "netoPct": -0.31,
+     "netoR": -0.121,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 7,
+     "aciertos": 86,
+     "netoPct": 0.252,
+     "netoR": 0.032,
+     "perdidasSeguidas": 1
+    }
+   },
+   "1d|largo|stop disparo|objetivo 0.5": {
+    "historia": {
+     "n": 68,
+     "aciertos": 68,
+     "netoPct": -0.272,
+     "netoR": -0.084,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 7,
+     "aciertos": 71,
+     "netoPct": 0.052,
+     "netoR": -0.035,
+     "perdidasSeguidas": 2
+    }
+   },
+   "1d|largo|stop disparo|objetivo 0.75": {
+    "historia": {
+     "n": 68,
+     "aciertos": 57,
+     "netoPct": -0.297,
+     "netoR": -0.095,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 7,
+     "aciertos": 57,
+     "netoPct": 0.062,
+     "netoR": -0.105,
+     "perdidasSeguidas": 3
+    }
+   },
+   "1d|largo|stop disparo|objetivo 1": {
+    "historia": {
+     "n": 68,
+     "aciertos": 53,
+     "netoPct": -0.157,
+     "netoR": -0.041,
+     "perdidasSeguidas": 4
+    },
+    "limpio": {
+     "n": 7,
+     "aciertos": 57,
+     "netoPct": 0.394,
+     "netoR": 0.038,
+     "perdidasSeguidas": 3
+    }
+   },
+   "1d|largo|stop macro|objetivo 0.33": {
+    "historia": {
+     "n": 68,
+     "aciertos": 65,
+     "netoPct": -2.735,
+     "netoR": -0.15,
+     "perdidasSeguidas": 6
+    },
+    "limpio": {
+     "n": 7,
+     "aciertos": 100,
+     "netoPct": 3.733,
+     "netoR": 0.312,
+     "perdidasSeguidas": 0
+    }
+   },
+   "1d|largo|stop macro|objetivo 0.5": {
+    "historia": {
+     "n": 68,
+     "aciertos": 56,
+     "netoPct": -3.145,
+     "netoR": -0.17,
+     "perdidasSeguidas": 7
+    },
+    "limpio": {
+     "n": 7,
+     "aciertos": 100,
+     "netoPct": 5.757,
+     "netoR": 0.482,
+     "perdidasSeguidas": 0
+    }
+   },
+   "1d|largo|stop macro|objetivo 0.75": {
+    "historia": {
+     "n": 68,
+     "aciertos": 47,
+     "netoPct": -3.507,
+     "netoR": -0.184,
+     "perdidasSeguidas": 11
+    },
+    "limpio": {
+     "n": 7,
+     "aciertos": 100,
+     "netoPct": 8.722,
+     "netoR": 0.732,
+     "perdidasSeguidas": 0
+    }
+   },
+   "1d|largo|stop macro|objetivo 1": {
+    "historia": {
+     "n": 68,
+     "aciertos": 43,
+     "netoPct": -2.466,
+     "netoR": -0.156,
+     "perdidasSeguidas": 20
+    },
+    "limpio": {
+     "n": 7,
+     "aciertos": 100,
+     "netoPct": 11.673,
+     "netoR": 0.981,
+     "perdidasSeguidas": 0
+    }
+   }
+  },
+  "chatgpt": {
+   "historia": {
+    "n": 13,
+    "aciertos": 54,
+    "netoPct": -0.407,
+    "netoR": -0.272,
+    "perdidasSeguidas": 2
+   },
+   "limpio": {
+    "n": 1,
+    "aciertos": 100,
+    "netoPct": 0.7,
+    "netoR": 0.467,
+    "perdidasSeguidas": 0
+   }
+  },
+  "gemini": {
+   "historia": {
+    "n": 577,
+    "aciertos": 68,
+    "netoPct": -0.102,
+    "netoR": -0.034,
+    "perdidasSeguidas": 5
+   },
+   "limpio": {
+    "n": 24,
+    "aciertos": 71,
+    "netoPct": -0.011,
+    "netoR": -0.004,
+    "perdidasSeguidas": 3
+   }
+  },
+  "agotamiento": {
+   "historia": {
+    "n": 154,
+    "aciertos": 45,
+    "netoPct": -0.61,
+    "netoR": -0.177,
+    "perdidasSeguidas": 7
+   },
+   "limpio": {
+    "n": 13,
+    "aciertos": 38,
+    "netoPct": -0.631,
+    "netoR": -0.254,
+    "perdidasSeguidas": 3
    }
   }
  }

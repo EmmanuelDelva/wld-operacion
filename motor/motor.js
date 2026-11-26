@@ -662,6 +662,7 @@ export function simularTirador(p15, pM, marco, P, ctx = {}) {
       stop: entrada - lado * riesgo,
       objetivo1: conPrevio ? previo : entrada + lado * T.parcialMinimoR * riesgo,
       objetivo2,
+      invalidaMacro: z.invalida,
       conPrevio,
       vence, costoR,
       toco1: false,
