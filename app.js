@@ -22,8 +22,8 @@ let pegando = null;
 let todo = leerGuardado('todo', false);   // mostrar también las reglas sin ventaja medida
 
 const NOMBRE = { '1w': '1 S', '1d': '1 D', '4h': '4 h', '3h': '3 h', '2h': '2 h', '1h': '1 h', '45m': '45 m', '30m': '30 m', '15m': '15 m', '5m': '5 m', '3m': '3 m', '1m': '1 m' };
-const REGLA = { zona: 'Retroceso, entrada en zona', retroceso: 'Retroceso, con confirmación', barrido: 'Ruptura fallida' };
-const CORTA = { zona: 'Zona', retroceso: 'Confirmación', barrido: 'Ruptura fallida' };
+const REGLA = { tirador: 'Francotirador, disparo en 15 m', zona: 'Retroceso, entrada en zona', retroceso: 'Retroceso, con confirmación', barrido: 'Ruptura fallida' };
+const CORTA = { tirador: 'Francotirador', zona: 'Zona', retroceso: 'Confirmación', barrido: 'Ruptura fallida' };
 const LADO = l => (l < 0 ? 'Corto' : 'Largo');
 const color = l => (l < 0 ? 'rojo' : 'verde');
 const dec = () => (E && E.precio < 1 ? 4 : E && E.precio < 100 ? 2 : 1);
@@ -68,61 +68,118 @@ function escalera(partes) {
   return `<div class="fila" style="gap:6px;align-items:stretch">${partes.sort((a, b) => a.p - b.p).map(x => `<div class="seg ${x.c || ''}"><div class="lab ${x.k || ''}">${x.t}</div><div class="num" style="font-size:15px">${x.v}</div>${x.s ? `<div class="lab">${x.s}</div>` : ''}</div>`).join('')}</div>`;
 }
 
-function hero() {
-  const p = E.principal;
-  const m = E.mando;
-  const mando = `<div class="lab" style="padding-top:6px">Manda: <b style="color:var(--texto)">${m.manda ? `${NOMBRE[m.manda]}, ${sesgoTxt(m.direccion)}` : 'sin impulso claro en 15 m'}</b>${m.manda && ['15m', '30m', '45m'].includes(m.manda) ? ' (impulso corto, todavía no llega a 1 h)' : ''} · Fondo: <b style="color:var(--texto)">${m.fondo ? `${NOMBRE[m.fondo]}, ${sesgoTxt(m.direccionFondo)}` : 'sin tendencia clara'}</b></div>`;
-  const datos = `<div class="cuatro" style="margin-top:10px">
+function datosRapidos() {
+  return `<div class="cuatro" style="margin-top:10px">
     <div><div class="lab">Precio</div><div class="num" style="font-size:16px">${n(E.precio)}</div></div>
     <div><div class="lab">Funding</div><div class="num" style="font-size:16px">${E.extras.funding == null ? '—' : pct(E.extras.funding, 3)}</div></div>
     <div><div class="lab">Volatilidad</div><div class="num" style="font-size:16px">${E.volatilidad.percentil ?? '—'}<span class="lab"> pct.</span></div></div>
     <div><div class="lab">Cuentas grandes</div><div class="num" style="font-size:16px">${n(E.extras.grandesCuentas, 2)}</div></div></div>`;
-  if (!p) return `<div class="p"><div class="lab">Estado</div><div class="estado">Sin operación</div><div class="mut">Ninguna temporalidad tiene zona de retroceso ni ruptura fallida en curso.</div>${mando}${datos}</div>`;
+}
 
+// Lo primero: qué temporalidad manda, desde dónde hasta dónde va su movimiento, el fondo y qué vigilar.
+function bloqueManda() {
+  const m = E.mando;
+  const mv = E.movimiento;
+  const vg = E.vigilar;
+  const c = m.direccion > 0 ? 'verde' : m.direccion < 0 ? 'rojo' : 'gris';
+  const titulo = m.manda ? `${NOMBRE[m.manda]}, ${sesgoTxt(m.direccion)}` : 'Sin impulso claro en 15 m';
+  const recorrido = mv
+    ? `Va desde <b class="num">${n(mv.desde)}</b> (${hora(mv.tDesde)}) hasta <b class="num">${n(mv.hasta)}</b> (${hora(mv.tHasta)}): ${pct(100 * (mv.hasta / mv.desde - 1), 1)}. Precio ahora <span class="num">${n(E.precio)}</span>.${['15m', '30m', '45m'].includes(m.manda) ? ' Es un impulso corto: todavía no llega a 1 h.' : ''}`
+    : 'Las temporalidades chicas no apuntan a ningún lado. Lo que cuenta es el fondo.';
+  let fondo = 'ninguna temporalidad con tendencia clara';
+  if (m.fondo) {
+    fondo = `${NOMBRE[m.fondo]}, ${sesgoTxt(m.direccionFondo)}`;
+    if (m.manda) fondo += m.direccion === m.direccionFondo ? ' · lo que manda va a favor del fondo' : ' · lo que manda va contra el fondo: es un rebote o un retroceso';
+  }
+  let vigilar = '—';
+  if (vg) {
+    const x = E.porMarco[vg.marco];
+    const tf = NOMBRE[vg.marco];
+    const abierta = x ? ['tirador', 'retroceso'].map(r => x[r]).find(q => q && q.estado === 'en operación') : null;
+    const z = x && x.retroceso && (x.retroceso.estado === 'preparando' || x.retroceso.estado === 'en zona') ? x.retroceso : null;
+    if (abierta) vigilar = `<b>${tf}</b>: ya hay ${LADO(abierta.op.lado).toLowerCase()} confirmado desde <span class="num">${n(abierta.op.entrada)}</span>. Terminaría cerca de <span class="num">${n(abierta.op.objetivo2)}</span> y se invalida en <span class="num">${n(abierta.op.stop)}</span>.`;
+    else if (z) vigilar = `<b>${tf}</b>: el ${LADO(z.lado).toLowerCase()} empezaría entre <span class="num">${n(z.desde)}</span> y <span class="num">${n(z.hasta)}</span>, terminaría cerca de <span class="num">${n(z.objetivo2)}</span> y se invalida si pasa de <span class="num">${n(z.invalida)}</span>.`;
+    else vigilar = `<b>${tf}</b> está ${vg.sesgo}. Empezaría a girar a ${E.precio < vg.emaLenta ? 'alcista con cierres sobre' : 'bajista con cierres bajo'} su EMA50, en <span class="num">${n(vg.emaLenta)}</span>.`;
+  }
+  return `<div class="p"><div class="lab">Manda ahora</div>
+    <div class="estado ${c}">${titulo}</div>
+    <div style="padding:4px 0 8px">${recorrido}</div>
+    <div class="kv"><span>Fondo</span><span>${fondo}</span></div>
+    <div class="kv"><span>A vigilar</span><span>${vigilar}</span></div>
+    ${datosRapidos()}</div>`;
+}
+
+// Una opción: la macro (1 h a 1 D) o la micro (15 y 30 m).
+function tarjetaOpcion(titulo, p) {
+  if (!p) return `<div class="p"><div class="lab">${titulo}</div><div class="estado" style="font-size:20px">Sin operación</div><div class="mut">Ninguna de estas temporalidades tiene zona ni entrada vigente.</div></div>`;
   const op = p.op;
   const lado = op ? op.lado : p.lado;
   const tf = NOMBRE[p.marco];
   const f = op ? op.factores : p.factores;
   const ev = evidencia(p.regla, p.marco, lado);
+  const m = E.mando;
   const fondo = m.direccionFondo === 0 ? '' : lado === m.direccionFondo ? '<span class="chip verde">a favor del fondo</span>' : '<span class="chip ambar">contra el fondo</span>';
   let palabra;
   let frase;
   let partes;
+  let nota = '';
   if (op) {
     const avance = lado * (E.precio - op.entrada) / op.riesgo;
     palabra = p.estado === 'reciente' ? 'Entrada confirmada' : 'En operación';
-    frase = `${LADO(lado)} de ${tf} · ${REGLA[p.regla]} · desde ${hora(op.t)} · va en ${R(avance)}`;
+    frase = `${LADO(lado)} de ${tf} · ${CORTA[p.regla]} · desde ${hora(op.t)} · va en ${R(avance)}`;
     partes = [
-      { p: op.stop, t: 'Stop: se invalida en', v: n(op.stop), s: `a ${op.riesgoPct.toFixed(2)} % de la entrada`, c: 'inv', k: 'rojo' },
-      { p: op.entrada, t: 'Entrada', v: n(op.entrada), s: `precio ahora ${n(E.precio)}`, c: 'zona', k: 'ambar' },
-      { p: op.objetivo1, t: 'Objetivo 1', v: n(op.objetivo1), s: op.toco1 ? 'ya lo tocó' : '' },
-      { p: op.objetivo2, t: 'Objetivo 2', v: n(op.objetivo2), s: `neto ${R(lado * (op.objetivo2 - op.entrada) / op.riesgo - op.costoR)}` },
+      { p: op.stop, t: 'Stop', v: n(op.stop), s: `a ${op.riesgoPct.toFixed(2)} %`, c: 'inv', k: 'rojo' },
+      { p: op.entrada, t: 'Entrada', v: n(op.entrada), s: `ahora ${n(E.precio)}`, c: 'zona', k: 'ambar' },
+      { p: op.objetivo1, t: 'Objetivo 1', v: n(op.objetivo1), s: op.toco1 ? 'ya lo tocó' : R(lado * (op.objetivo1 - op.entrada) / op.riesgo) },
+      { p: op.objetivo2, t: 'Objetivo 2', v: n(op.objetivo2), s: R(lado * (op.objetivo2 - op.entrada) / op.riesgo) },
     ];
+    nota = `El costo se lleva ${op.costoR.toFixed(2)} R. Neto al objetivo 2: ${R(lado * (op.objetivo2 - op.entrada) / op.riesgo - op.costoR)}.`;
   } else if (p.estado === 'barrido en curso') {
     palabra = 'Atento';
-    frase = `Ruptura en ${tf}: si una vela cierra de vuelta ${lado < 0 ? 'bajo' : 'sobre'} ${n(p.nivel)}, abre ${LADO(lado).toLowerCase()}. Quedan ${Math.max(p.quedan, 0) + 1} velas.`;
-    partes = [{ p: p.nivel, t: 'Nivel barrido', v: n(p.nivel), s: `precio ahora ${n(E.precio)}`, c: 'zona', k: 'ambar' }];
+    frase = `Ruptura en ${tf}: si una vela cierra de vuelta ${lado < 0 ? 'bajo' : 'sobre'} ${n(p.nivel)}, abre ${LADO(lado).toLowerCase()}.`;
+    partes = [{ p: p.nivel, t: 'Nivel barrido', v: n(p.nivel), s: `ahora ${n(E.precio)}`, c: 'zona', k: 'ambar' }];
   } else {
     const dentro = E.precio >= p.desde && E.precio <= p.hasta;
-    palabra = p.estado === 'en zona' ? 'Esperar confirmación' : 'Esperar';
-    frase = `${LADO(lado)} de ${tf} ${p.estado === 'en zona' ? 'en zona' : 'en preparación'}${dentro ? ': el precio ya está en la zona' : ''}`;
+    const espera = p.estado === 'preparando' || p.estado === 'lejos';
+    palabra = p.estado === 'apuntando' ? 'Apuntando' : p.estado === 'en zona' ? 'Esperar confirmación' : 'Esperar';
+    frase = `${LADO(lado)} de ${tf}${espera ? ' en preparación' : ': el precio ya tocó la zona'}${dentro ? ' y sigue dentro' : ''}${espera && p.faltaPct ? `: la zona queda a ${p.faltaPct.toFixed(1)} % del precio` : ''}`;
     partes = [
-      { p: p.invalida, t: 'Se invalida si pasa de', v: n(p.invalida), s: `riesgo ${p.riesgoPct.toFixed(2)} %`, c: 'inv', k: 'rojo' },
-      { p: p.ideal, t: 'Abre entre', v: `${n(p.desde)} y ${n(p.hasta)}`, s: `ideal ${n(p.ideal)} · precio ahora ${n(E.precio)}`, c: 'zona', k: 'ambar' },
-      { p: p.objetivo1, t: 'Objetivo 1', v: n(p.objetivo1), s: `${P.retroceso.objetivo1R} R` },
-      { p: p.objetivo2, t: 'Objetivo 2', v: n(p.objetivo2), s: `${P.retroceso.objetivo2R} R` },
+      { p: p.invalida, t: 'Se invalida si pasa de', v: n(p.invalida), s: '', c: 'inv', k: 'rojo' },
+      { p: p.ideal, t: 'Abre entre', v: `${n(p.desde)} y ${n(p.hasta)}`, s: `ahora ${n(E.precio)}`, c: 'zona', k: 'ambar' },
+      { p: p.objetivo2, t: 'Terminaría cerca de', v: n(p.objetivo2), s: '' },
     ];
+    if (p.regla === 'tirador' && p.estado === 'apuntando') nota = `Disparo: una vela de 15 m que cierre ${lado < 0 ? 'bajo' : 'sobre'} <span class="num">${n(p.gatillo)}</span>, cerca de su extremo. El stop queda detrás del ${lado < 0 ? 'máximo' : 'mínimo'} de las últimas velas de 15 m, entre ${P.tirador.stopMinimoPct} % y ${P.tirador.stopMaximoPct} %.`;
+    else if (p.regla === 'tirador' && p.armada === false) nota = `El precio ya pasó por esta zona sin dar entrada. Se vuelve a armar cuando una vela de 15 m cierre ${lado < 0 ? 'bajo' : 'sobre'} <span class="num">${n(lado < 0 ? p.desde : p.hasta)}</span> y el precio regrese a la zona.`;
+    else if (p.regla === 'tirador') nota = `Cuando el precio entre a la zona, el disparo será una vela de 15 m que cierre ${lado < 0 ? 'bajo el mínimo' : 'sobre el máximo'} de las tres anteriores. Stop entre ${P.tirador.stopMinimoPct} % y ${P.tirador.stopMaximoPct} %.`;
+    else if (p.gatillo != null) nota = `Confirma con una vela de ${tf} que cierre ${lado < 0 ? 'bajo' : 'sobre'} <span class="num">${n(p.gatillo)}</span>.`;
   }
-  const enZona = evidencia('zona', p.marco, lado);
-  const peor = !op && enZona.neto != null && ev.neto != null && enZona.neto < ev.neto ? ` Entrar en la zona sin esperar ese cierre ha rendido peor: ${R(enZona.neto)} contra ${R(ev.neto)}.` : '';
-  const confirma = !op && p.gatillo != null && p.estado !== 'barrido en curso' ? `<div class="lab" style="padding-top:6px">Con confirmación: vela de ${tf} que cierre ${lado < 0 ? 'bajo' : 'sobre'} <span class="num">${n(p.gatillo)}</span>.${peor}</div>` : '';
+  const celda = EV && EV.celdas[`${p.regla}|${p.marco}|${lado < 0 ? 'corto' : 'largo'}`];
+  const rec = celda && celda.recorrido && celda.historia.n ? `<div class="lab" style="padding-top:4px">De ${celda.historia.n} casos, antes del stop llegó a +1 R el ${celda.recorrido[1]} %, a +2 R el ${celda.recorrido[2]} % y a +3 R el ${celda.recorrido[3]} %.</div>` : '';
   return `<div class="p">
-    <div class="fila"><div class="lab">Estado</div>${fondo}<span class="chip">a favor ${f ? `${f.aFavor} de ${f.de}` : '—'}</span></div>
-    <div class="estado">${palabra}</div>
+    <div class="fila"><div class="lab">${titulo}</div>${fondo}<span class="chip">a favor ${f ? `${f.aFavor} de ${f.de}` : '—'}</span></div>
+    <div class="estado" style="font-size:22px">${palabra}</div>
     <div class="${color(lado)}" style="padding:2px 0 8px">${frase}</div>
-    ${escalera(partes)}${confirma}
-    <div class="lab ${ev.clase}" style="padding-top:6px">Evidencia de esta regla en ${tf}: ${ev.texto}</div>
-    ${mando}${datos}</div>`;
+    ${escalera(partes)}
+    ${nota ? `<div class="lab" style="padding-top:6px">${nota}</div>` : ''}
+    <div class="lab ${ev.clase}" style="padding-top:6px">Evidencia en ${tf}: ${ev.texto}</div>${rec}</div>`;
+}
+
+// Macro y micro: alineados o no, y dónde salir si se va contra el macro.
+function alineacion() {
+  const a = E.macro;
+  const b = E.micro;
+  const la = a ? (a.op ? a.op.lado : a.lado) : 0;
+  const lb = b ? (b.op ? b.op.lado : b.lado) : 0;
+  let t;
+  if (!la && !lb) t = 'No hay opción macro ni micro en este momento.';
+  else if (!la) t = `Solo hay opción micro, de ${LADO(lb).toLowerCase()}. Sin macro que la respalde, trátala como operación corta.`;
+  else if (!lb) t = `Solo hay opción macro, de ${LADO(la).toLowerCase()}. El micro no tiene entrada todavía.`;
+  else if (la === lb) t = `<b class="verde">Alineados:</b> macro y micro van de ${LADO(la).toLowerCase()}.`;
+  else {
+    const salida = a.op ? a.op.entrada : la < 0 ? a.desde : a.hasta;
+    t = `<b class="ambar">Desalineados:</b> el micro va de ${LADO(lb).toLowerCase()} contra el macro, que va de ${LADO(la).toLowerCase()}. Si operas el micro vas contra la tendencia: sal antes de <span class="num">${n(salida)}</span>, donde empieza el macro.`;
+  }
+  return `<div class="p"><div class="h">Macro y micro</div><div style="padding-top:6px">${t}</div></div>`;
 }
 
 function tarjetaIdea() {
@@ -258,8 +315,15 @@ function porTemporalidad() {
   const filas = E.operables.map(marco => {
     const x = E.porMarco[marco];
     const items = [];
-    for (const regla of ['zona', 'retroceso', 'barrido']) {
+    for (const regla of ['tirador', 'zona', 'retroceso', 'barrido']) {
       const s = x[regla];
+      if (!s) continue;
+      if (regla === 'tirador' && s.estado === 'apuntando') {
+        const ev = evidencia('tirador', marco, s.lado);
+        items.push(`<div class="l1"><span class="chip ambar">${LADO(s.lado)} apuntando</span><span class="num">zona entre ${n(s.desde)} y ${n(s.hasta)}</span></div>
+          <div class="l2">Francotirador · dispara si una vela de 15 m cierra ${s.lado < 0 ? 'bajo' : 'sobre'} ${n(s.gatillo)} · se invalida en ${n(s.invalida)}<br><span class="${ev.clase}">${ev.texto}</span></div>`);
+        continue;
+      }
       if (s.estado === 'en operación') {
         const o = s.op;
         if (!todo && sinVentaja(o)) continue;
@@ -307,8 +371,9 @@ function pintar() {
   guardar('vistas', [...vistas].slice(-400));
   app.innerHTML = cabecera()
     + (falla ? `<div class="p aviso">No se pudo actualizar: ${esc(falla)}. Lo que ves es el último dato bueno.</div>` : '')
-    + `<div class="cols"><div class="ancho2">${hero()}</div><div style="display:flex;flex-direction:column;gap:10px">${tarjetaIdea()}${tarjetaOpiniones()}</div></div>`
-    + `<div class="cols"><div class="p" style="padding-top:0;padding-bottom:0">${secMercado()}${secFase()}</div><div class="p" style="padding-top:0;padding-bottom:0">${secMapa()}</div><div class="p" style="padding-top:0;padding-bottom:0">${secBoleta()}</div></div>`
+    + bloqueManda()
+    + `<div class="cols">${tarjetaOpcion('Opción macro · 1 h a 1 D', E.macro)}${tarjetaOpcion('Opción micro · 15 y 30 m', E.micro)}<div style="display:flex;flex-direction:column;gap:10px">${alineacion()}${tarjetaIdea()}</div></div>`
+    + `<div class="cols"><div class="p" style="padding-top:0;padding-bottom:0">${secMercado()}${secFase()}</div><div class="p" style="padding-top:0;padding-bottom:0">${secMapa()}${secBoleta()}</div>${tarjetaOpiniones()}</div>`
     + `<div class="cols">${porTemporalidad()}${senales()}</div>`
     + pie();
   edad();
@@ -329,6 +394,8 @@ function textoParaIA() {
   L.push(`Hora de Guadalajara: ${hora(E.hora)}. Precio ${n(E.precio)}. Funding ${E.extras.funding == null ? 'sin dato' : pct(E.extras.funding, 3)}. Cuentas grandes, largos por corto: ${n(E.extras.grandesCuentas, 2)}. Volatilidad de 1 h en percentil ${E.volatilidad.percentil}.`);
   L.push('Sesgo y fuerza (0 a 100) en velas cerradas: ' + MARCOS.map(k => `${NOMBRE[k]} ${E.marcos[k].listo ? `${E.marcos[k].sesgo} ${E.marcos[k].fuerza}` : 'sin dato'}`).join(', ') + '.');
   L.push(`Quién manda: ${E.mando.manda ? `${NOMBRE[E.mando.manda]}, ${sesgoTxt(E.mando.direccion)}` : 'sin impulso en 15 m'}. Fondo: ${E.mando.fondo ? `${NOMBRE[E.mando.fondo]}, ${sesgoTxt(E.mando.direccionFondo)}` : 'sin tendencia clara'}.`);
+  if (E.movimiento) L.push(`El movimiento que manda va desde ${n(E.movimiento.desde)} hasta ${n(E.movimiento.hasta)}.`);
+  if (E.micro && E.macro && E.micro !== E.principal) { const b = E.micro; const lb = b.op ? b.op.lado : b.lado; L.push(`Opción micro: ${LADO(lb)} de ${NOMBRE[b.marco]}, ${b.estado}.`); }
   if (E.btc) L.push(`BTC: ${['1d', '4h', '1h'].map(k => `${NOMBRE[k]} ${E.btc.marcos[k].sesgo}`).join(', ')}. WLD frente a BTC en 24 h: ${pct(E.btc.diferencia)}.`);
   L.push(`Mapa del día: apertura ${n(E.mapa.apertura)}, máximo ${n(E.mapa.maximo)}, mínimo ${n(E.mapa.minimo)}, techo probable ${n(E.mapa.techo)}, piso probable ${n(E.mapa.piso)}.`);
   if (p) {
@@ -374,7 +441,9 @@ async function actualizar() {
     if (!P) P = await (await fetch('reglas/parametros.json', { cache: 'no-store' })).json();
     if (!EV) { try { const r = await fetch('reglas/evidencia.json', { cache: 'no-store' }); if (r.ok) EV = await r.json(); } catch { /* sin evidencia */ } }
     E = await leerEstado({ parametros: P });
-    E.principal = elegirPrincipal(E.porMarco, E.operables, E.hora, E.mando, pesoEvidencia);
+    E.macro = elegirPrincipal(E.porMarco, P.tirador.marcos, E.hora, E.mando, pesoEvidencia, { reglas: ['tirador'], precio: E.precio });
+    E.micro = elegirPrincipal(E.porMarco, ['15m', '30m'], E.hora, E.mando, pesoEvidencia, { reglas: ['retroceso', 'barrido'], precio: E.precio });
+    E.principal = E.macro || E.micro;
     falla = null;
   } catch (e) {
     falla = e && e.message ? e.message : String(e);

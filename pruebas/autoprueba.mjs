@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import {
   agrupar, ema, atr, adx, eficiencia, percentil, cuantil, leerMarco, soloCerradas, preparar,
-  regimen, zona, simular, resumir, quienManda, leerFase, mapaDelDia,
+  regimen, zona, simular, simularTirador, resumir, quienManda, leerFase, mapaDelDia,
 } from '../motor/motor.js';
 
 const P = JSON.parse(await readFile(new URL('../reglas/parametros.json', import.meta.url), 'utf8'));
@@ -175,6 +175,35 @@ prueba(() => {
   assert.equal(m.bloques[0].estado, 'cerrado');
   assert.equal(m.bloques[1].estado, 'en curso');
   assert.ok(m.bloques[0].dias >= 60);
+});
+
+// Francotirador: sobre un paseo aleatorio con deriva a la baja, toda operación debe cumplir sus propias reglas.
+prueba(() => {
+  let semilla = 12345;
+  const azar = () => { semilla = (semilla * 1664525 + 1013904223) % 4294967296; return semilla / 4294967296; };
+  const t0 = Date.UTC(2026, 0, 5);
+  const v15 = [];
+  let precio = 100;
+  for (let i = 0; i < 40000; i++) {
+    const o = precio;
+    precio = Math.max(1, precio * (1 + (azar() - 0.505) * 0.012 + Math.sin(i / 300) * 0.0006));
+    const c = precio;
+    v15.push({ t: t0 + i * 15 * MIN, o, c, h: Math.max(o, c) * (1 + azar() * 0.002), l: Math.min(o, c) * (1 - azar() * 0.002), v: 100, tb: 100 * azar(), fin: t0 + (i + 1) * 15 * MIN - 1 });
+  }
+  const T = P.tirador;
+  const { ops, vivo } = simularTirador(preparar(v15, C), preparar(agrupar(v15, 15, 120), C), '2h', P);
+  const cerradas = ops.filter(o => o.estado === 'cerrada' && o.g.fin && o.finRecorrido);
+  assert.ok(cerradas.length >= 20, `solo ${cerradas.length} operaciones`);
+  assert.ok(['sin operación', 'preparando', 'apuntando', 'en operación'].includes(vivo.estado));
+  for (const o of cerradas) {
+    assert.ok(o.lado * (o.entrada - o.stop) > 0 && o.lado * (o.objetivo2 - o.entrada) > 0);
+    assert.ok(o.riesgoPct >= T.stopMinimoPct - 1e-9 && o.riesgoPct <= T.stopMaximoPct + 1e-9, `stop a ${o.riesgoPct} %`);
+    assert.ok(Math.abs(o.objetivo2 - o.entrada) / o.riesgo - o.costoR >= T.rrMinimo - 1e-9);
+    assert.ok(o.mfe >= 0 && o.netoBE != null && o.netoGestion != null);
+    if (o.motivo === 'stop') { cerca(o.bruto, -1, 1e-9); assert.ok(o.netoGestion <= o.mfe + 1e-9); }
+    if (o.motivo === 'objetivo 2') { cerca(o.bruto, Math.abs(o.objetivo2 - o.entrada) / o.riesgo, 1e-9); assert.ok(o.mfe >= o.bruto - 1e-9); }
+    assert.ok(o.netoBE <= Math.max(o.neto, -o.costoR) + 1e-9);
+  }
 });
 
 console.log(`Motor: ${pruebas} pruebas pasaron.`);

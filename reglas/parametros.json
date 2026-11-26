@@ -1,10 +1,41 @@
 {
-  "version": "2",
+  "version": "3",
   "nota": "Las condiciones no bloquean: se cuentan como factores a favor y cada operación se muestra con la evidencia medida de su celda (regla, temporalidad y lado). Cualquier cambio aquí obliga a repetir las pruebas.",
-  "velas": { "1m": 1500, "5m": 500, "15m": 1500, "1h": 2500, "4h": 500, "1d": 500, "1w": 500 },
-  "velasBtc": { "15m": 1500, "1h": 2500, "4h": 500, "1d": 500 },
-  "operables": ["15m", "30m", "45m", "1h", "2h", "3h", "4h", "1d"],
-  "superior": { "15m": "1h", "30m": "2h", "45m": "3h", "1h": "4h", "2h": "1d", "3h": "1d", "4h": "1d", "1d": "1w" },
+  "velas": {
+    "1m": 1500,
+    "5m": 500,
+    "15m": 1500,
+    "1h": 2500,
+    "4h": 500,
+    "1d": 500,
+    "1w": 500
+  },
+  "velasBtc": {
+    "15m": 1500,
+    "1h": 2500,
+    "4h": 500,
+    "1d": 500
+  },
+  "operables": [
+    "15m",
+    "30m",
+    "45m",
+    "1h",
+    "2h",
+    "3h",
+    "4h",
+    "1d"
+  ],
+  "superior": {
+    "15m": "1h",
+    "30m": "2h",
+    "45m": "3h",
+    "1h": "4h",
+    "2h": "1d",
+    "3h": "1d",
+    "4h": "1d",
+    "1d": "1w"
+  },
   "contexto": {
     "emaRapida": 21,
     "emaLenta": 50,
@@ -13,16 +44,27 @@
     "fuerzaLateral": 20,
     "adxTendencia": 25
   },
-  "volatilidad": { "velas": 500, "horas": 2160, "minimo": 20, "maximo": 97 },
-  "costos": { "idaYVueltaPct": 0.20, "estresPct": 0.30 },
+  "volatilidad": {
+    "velas": 500,
+    "horas": 2160,
+    "minimo": 20,
+    "maximo": 97
+  },
+  "costos": {
+    "idaYVueltaPct": 0.2,
+    "estresPct": 0.3
+  },
   "retroceso": {
-    "separacionAtr": 0.30,
+    "separacionAtr": 0.3,
     "anchoZonaAtr": 1.0,
     "margenInvalidacionAtr": 0.35,
     "velasEspera": 6,
     "margenStopAtr": 0.25,
     "stopMinimoAtr": 1.0,
-    "stopMinimoPorMarco": { "15m": 1.25, "30m": 1.25 },
+    "stopMinimoPorMarco": {
+      "15m": 1.25,
+      "30m": 1.25
+    },
     "objetivo1R": 1.5,
     "objetivo2R": 2.5,
     "vencimientoVelas": 18
@@ -33,13 +75,50 @@
     "velasRegreso": 3,
     "margenStopAtr": 0.15,
     "stopMinimoAtr": 1.0,
-    "stopMinimoPorMarco": { "15m": 1.25, "30m": 1.25 },
+    "stopMinimoPorMarco": {
+      "15m": 1.25,
+      "30m": 1.25
+    },
     "objetivo1R": 1.2,
     "objetivo2R": 2.4,
     "vencimientoVelas": 12
   },
-  "fase": { "marco": "4h", "velasRango": 40 },
-  "mapaDelDia": { "dias": 90, "percentil": 80, "frecuenciaSesgo": 60, "diasMinimos": 50 },
+  "tirador": {
+    "marcos": [
+      "1h",
+      "2h",
+      "3h",
+      "4h",
+      "1d"
+    ],
+    "velasRuptura": 3,
+    "tercio": 0.3334,
+    "rangoMaximoAtr": 1.8,
+    "velasExtremo": 8,
+    "margenStopAtr": 0.25,
+    "stopMinimoAtr": 1.5,
+    "stopMinimoPct": 1.2,
+    "stopMaximoPct": 3.5,
+    "rrMinimo": 2.0,
+    "velasPrevio": 10,
+    "parcialMinimoR": 1.5,
+    "parcial": 0.4,
+    "objetivoLargoR": 4.0,
+    "velasTrail": 6,
+    "velasPaciencia": 16,
+    "avanceMinimoR": 0.5,
+    "velasDelta": 3
+  },
+  "fase": {
+    "marco": "4h",
+    "velasRango": 40
+  },
+  "mapaDelDia": {
+    "dias": 90,
+    "percentil": 80,
+    "frecuenciaSesgo": 60,
+    "diasMinimos": 50
+  },
   "evidencia": {
     "corte": "2026-09-16T00:00:00Z",
     "muestraBaja": 30,

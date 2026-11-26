@@ -1,6 +1,6 @@
 # Las reglas
 
-Versión 2. Aquí nada bloquea: cada operación se muestra con sus factores a favor y con el resultado medido de su celda, que es la combinación de regla, temporalidad y lado. Los números viven en `reglas/parametros.json`.
+Versión 3. Aquí nada bloquea: cada operación se muestra con sus factores a favor y con el resultado medido de su celda, que es la combinación de regla, temporalidad y lado. Los números viven en `reglas/parametros.json`.
 
 Todo se evalúa en velas cerradas. Las reglas corren por separado en ocho temporalidades: 15, 30 y 45 minutos; 1, 2, 3 y 4 horas; y 1 día. El costo de ida y vuelta, 0.20 %, se descuenta siempre.
 
@@ -62,3 +62,40 @@ Corrida del 25 de noviembre de 2026, con historia desde el 24 de julio de 2023.
 - Los largos rindieron peor que los cortos.
 
 Son 48 comparaciones a la vez: alguna puede verse bien solo por azar. Lo que confirma o descarta una celda es lo que siga pasando con las señales nuevas.
+
+## Francotirador (versión 3)
+
+La idea sale del macro y el disparo se da en 15 minutos. Corre para macros de 1, 2, 3 y 4 horas y 1 día, cortos y largos por separado.
+
+| Paso | Regla |
+|---|---|
+| Idea | Régimen y zona del retroceso en la temporalidad macro, con su última vela cerrada. |
+| Armado | El precio cierra fuera de la zona, del lado de la tendencia, y luego entra a ella. Si toca la invalidación del macro o pasan 6 velas macro sin disparo, se cancela y hay que volver a armar. |
+| Disparo | Una vela de 15 m cierra rompiendo el extremo de las 3 anteriores, en el tercio final de su propio rango, y no mide más de 1.8 ATR de 15 m. |
+| Stop | Detrás del extremo de las últimas 8 velas de 15 m más 0.25 ATR. Mínimo: lo mayor entre 1.5 ATR de 15 m y 1.2 %. Si pide más de 3.5 %, no hay entrada. |
+| Objetivo | 2.5 veces el riesgo del macro, contado desde la entrada. Si no deja al menos 2 R netos, no hay entrada. |
+| Salida | Stop fijo y salida completa en el objetivo, o al vencer 18 velas macro. |
+
+Se midieron además, sin operar con ellas, dos formas de gestión (stop a la entrada después del objetivo 1; cobro parcial de 40 % con stop móvil), el flujo agresor de las últimas 3 velas y el recorrido: qué tan lejos llegó el precio antes del stop.
+
+### Lo que salió
+
+Corrida del 25 de noviembre de 2026, historia desde el 24 de julio de 2023, con costo de 0.20 % y funding incluidos.
+
+| Macro y lado | Casos | Neto por operación | Llegó a +1 R, +2 R y +3 R | Peor racha |
+|---|---|---|---|---|
+| 4 h, corto | 308 | +0.17 R | 56 %, 39 % y 30 % | 25 R |
+| 3 h, corto | 358 | +0.11 R | 56 %, 39 % y 28 % | 30 R |
+| 1 D, corto | 76 | +1.12 R | 51 %, 37 % y 32 % | 18 R |
+| 1 D, largo | 68 | +0.39 R | 53 %, 31 % y 19 % | 28 R |
+| 2 h, corto | 452 | −0.11 R | 50 %, 33 % y 23 % | 63 R |
+| 1 h, corto | 516 | −0.20 R | 46 %, 30 % y 19 % | 117 R |
+| Largos de 1 a 4 h | 167 a 360 | entre −0.08 y −0.15 R | | |
+
+- Ninguna celda alcanzó «ventaja medida»: en todas, el piso del intervalo de confianza queda en cero o debajo.
+- El cobro parcial con stop móvil rindió peor que dejar correr hasta el objetivo. El stop a la entrada no mejoró de forma consistente.
+- El flujo agresor casi no separa: nueve de cada diez disparos ya lo traen a favor.
+- El resultado de 1 D en corto descansa en pocas operaciones muy grandes, durante años en que WLD cayó. No se puede dar por repetible.
+- Solo dos de cada diez operaciones llegan al objetivo. Las rachas de pérdidas son largas: con 1 % de riesgo por operación, una racha de 25 R es una caída de 25 %.
+
+Toda la historia hasta el 25 de noviembre de 2026 ya se usó para diseñar o medir. Lo que confirme o descarte estas reglas son las señales nuevas.

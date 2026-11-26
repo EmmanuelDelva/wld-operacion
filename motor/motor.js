@@ -26,7 +26,7 @@ export async function traerVelas(simbolo, marco, cuantas = 500, traer = fetch) {
     const url = `${BINANCE}/fapi/v1/klines?symbol=${simbolo}&interval=${marco}&limit=${pedir}` + (hasta ? `&endTime=${hasta}` : '');
     const r = await traer(url);
     if (!r.ok) throw new Error(`Binance respondió ${r.status} al pedir velas de ${marco}`);
-    const lote = (await r.json()).map(k => ({ t: +k[0], o: +k[1], h: +k[2], l: +k[3], c: +k[4], v: +k[5], fin: +k[6] }));
+    const lote = (await r.json()).map(k => ({ t: +k[0], o: +k[1], h: +k[2], l: +k[3], c: +k[4], v: +k[5], fin: +k[6], tb: +k[9] }));
     if (!lote.length) break;
     velas = lote.concat(velas);
     hasta = lote[0].t - 1;
@@ -51,13 +51,14 @@ export function agrupar(velas, minutosBase, minutosDestino) {
     const inicio = dia + Math.floor((v.t - dia) / paso) * paso;
     let g = grupos.get(inicio);
     if (!g) {
-      g = { t: inicio, o: v.o, h: v.h, l: v.l, c: v.c, v: 0, fin: inicio + paso - 1, partes: 0 };
+      g = { t: inicio, o: v.o, h: v.h, l: v.l, c: v.c, v: 0, tb: 0, fin: inicio + paso - 1, partes: 0 };
       grupos.set(inicio, g);
     }
     g.h = Math.max(g.h, v.h);
     g.l = Math.min(g.l, v.l);
     g.c = v.c;
     g.v += v.v;
+    g.tb += v.tb || 0;
     g.partes += 1;
   }
   return [...grupos.values()]
@@ -530,6 +531,185 @@ export function resumir(ops, estres = 1) {
   };
 }
 
+// ---------- Francotirador: la idea sale del macro y el disparo se da en 15 m ----------
+
+// Avanza una operación de francotirador con una vela de 15 m. Lleva cuatro cuentas a la vez:
+// la principal (stop fijo y salida completa en el objetivo 2), dos variantes de gestión
+// y el recorrido: hasta dónde llegó el precio antes del stop o del vencimiento.
+function pasoTirador(o, b, i, v, T) {
+  const s = o.lado;
+  const enR = x => s * (x - o.entrada) / o.riesgo;
+  const favorable = enR(s > 0 ? b.h : b.l);
+  const tocaStop = s > 0 ? b.l <= o.stop : b.h >= o.stop;
+  const vencio = i - o.i >= o.vence;
+
+  // Variante con parcial y stop móvil: cobra una parte en el extremo previo y deja correr el resto.
+  const g = o.g;
+  if (!g.fin) {
+    if (!g.parcial) {
+      if (tocaStop) { g.r = -1; g.fin = true; }
+      else if (o.conPrevio && favorable >= enR(o.objetivo1)) { g.parcial = true; g.r = T.parcial * enR(o.objetivo1); g.trail = o.stop; }
+      else if (!o.conPrevio && favorable >= T.objetivoLargoR) { g.r = T.objetivoLargoR; g.fin = true; }
+      else if (i - o.i >= T.velasPaciencia && enR(b.c) < T.avanceMinimoR) { g.r = enR(b.c); g.fin = true; }
+    } else if (s > 0 ? b.l <= g.trail : b.h >= g.trail) {
+      g.r += (1 - T.parcial) * enR(g.trail); g.fin = true;
+    } else if (favorable >= T.objetivoLargoR) {
+      g.r += (1 - T.parcial) * T.objetivoLargoR; g.fin = true;
+    }
+    if (!g.fin && g.parcial) {
+      let e = s > 0 ? Infinity : -Infinity;
+      for (let k = i - T.velasTrail + 1; k <= i; k++) e = s > 0 ? Math.min(e, v[k].l) : Math.max(e, v[k].h);
+      g.trail = s > 0 ? Math.max(g.trail, e) : Math.min(g.trail, e);
+    }
+    if (!g.fin && vencio) { g.r = g.parcial ? g.r + (1 - T.parcial) * enR(b.c) : enR(b.c); g.fin = true; }
+    if (g.fin) o.netoGestion = g.r - o.costoR;
+  }
+
+  // Variante: stop a la entrada después de tocar el objetivo 1.
+  if (o.netoBE == null && o.toco1 && (s > 0 ? b.l <= o.entrada : b.h >= o.entrada)) o.netoBE = -o.costoR;
+
+  // Recorrido máximo a favor, en R.
+  if (!o.finRecorrido) {
+    if (tocaStop) o.finRecorrido = true;
+    else { if (favorable > o.mfe) o.mfe = favorable; if (vencio) o.finRecorrido = true; }
+  }
+
+  // Operación principal.
+  if (o.estado === 'abierta') {
+    if (tocaStop) cerrar(o, o.stop, 'stop', b, i);
+    else {
+      if (favorable >= enR(o.objetivo1)) o.toco1 = true;
+      if (favorable >= enR(o.objetivo2)) cerrar(o, o.objetivo2, 'objetivo 2', b, i);
+      else if (vencio) cerrar(o, b.c, 'tiempo', b, i);
+    }
+    if (o.estado === 'cerrada' && o.netoBE == null) o.netoBE = o.neto;
+  }
+  return o.estado === 'cerrada' && g.fin && o.finRecorrido;
+}
+
+// Recorre las velas de 15 m con el contexto de una temporalidad macro (1 h a 1 D).
+// La zona y el régimen salen de la última vela macro cerrada; el disparo, de una vela de 15 m que
+// cierra rompiendo el extremo de las tres anteriores, cerca de su propio extremo y sin ser un latigazo.
+// El stop va detrás del extremo de las últimas velas de 15 m; si queda muy lejos o el objetivo no paga
+// al menos 2 R netos, no hay entrada y se espera otra estructura.
+export function simularTirador(p15, pM, marco, P, ctx = {}) {
+  const T = P.tirador;
+  const R = P.retroceso;
+  const v = p15.velas;
+  const n = v.length;
+  const minutos = NATIVAS[marco] || ARMADAS[marco][1];
+  const vence = Math.round(R.vencimientoVelas * minutos / 15);
+  const espera = Math.round(R.velasEspera * minutos / 15);
+  const ops = [];
+  const seguimiento = [];
+  let j = -1;
+  let op = null;
+  let armada = 0;
+  let dentro = null;
+  let lado = 0;
+  let z = null;
+  for (let i = Math.max(60, T.velasExtremo + 5); i < n; i++) {
+    const b = v[i];
+    const a = p15.rango[i];
+    while (j + 1 < pM.velas.length && pM.velas[j + 1].fin <= b.fin) j++;
+    for (let q = seguimiento.length - 1; q >= 0; q--) {
+      const o = seguimiento[q];
+      const listo = pasoTirador(o, b, i, v, T);
+      if (o === op && o.estado === 'cerrada') op = null;
+      if (listo) seguimiento.splice(q, 1);
+    }
+    lado = j >= 0 ? regimen(pM, j, R) : 0;
+    if (lado === 0) { armada = 0; dentro = null; z = null; continue; }
+    z = zona(pM, j, lado, R, marco);
+    if (dentro && dentro.lado !== lado) dentro = null;
+    if (lado < 0 ? b.c < z.desde : b.c > z.hasta) armada = lado;
+    if (!dentro && armada === lado && (lado < 0 ? b.h >= z.desde : b.l <= z.hasta)) dentro = { lado, i };
+    if (dentro && ((lado < 0 ? b.h >= z.invalida : b.l <= z.invalida) || i - dentro.i > espera)) { dentro = null; armada = 0; }
+    if (!dentro || op) continue;
+
+    // Disparo.
+    let bajo = Infinity;
+    let alto = -Infinity;
+    for (let k = i - T.velasRuptura; k < i; k++) { bajo = Math.min(bajo, v[k].l); alto = Math.max(alto, v[k].h); }
+    const rango = b.h - b.l;
+    if (!(lado < 0 ? b.c < bajo : b.c > alto)) continue;
+    if (rango <= 0 || (lado < 0 ? b.c - b.l : b.h - b.c) > T.tercio * rango || rango > T.rangoMaximoAtr * a) continue;
+    let extremo = lado < 0 ? -Infinity : Infinity;
+    for (let k = Math.max(dentro.i, i - T.velasExtremo + 1); k <= i; k++) extremo = lado < 0 ? Math.max(extremo, v[k].h) : Math.min(extremo, v[k].l);
+    const entrada = b.c;
+    const riesgo = Math.max(Math.abs(extremo - lado * T.margenStopAtr * a - entrada), T.stopMinimoAtr * a, T.stopMinimoPct / 100 * entrada);
+    if (riesgo > T.stopMaximoPct / 100 * entrada) continue;
+    const objetivo2 = entrada + lado * R.objetivo2R * Math.abs(z.invalida - z.ideal);
+    const costoR = P.costos.idaYVueltaPct / 100 * entrada / riesgo;
+    if (Math.abs(objetivo2 - entrada) / riesgo - costoR < T.rrMinimo) continue;
+    let previo = lado < 0 ? Infinity : -Infinity;
+    for (let k = Math.max(0, j - T.velasPrevio + 1); k <= j; k++) previo = lado < 0 ? Math.min(previo, pM.velas[k].l) : Math.max(previo, pM.velas[k].h);
+    const conPrevio = lado * (previo - entrada) / riesgo >= T.parcialMinimoR && lado * (objetivo2 - previo) > 0;
+    let comprador = 0;
+    let volumen = 0;
+    for (let k = i - T.velasDelta + 1; k <= i; k++) { comprador += v[k].tb || 0; volumen += v[k].v; }
+    const flujo = volumen && v[i].tb != null && !Number.isNaN(v[i].tb) ? (2 * comprador - volumen) / volumen : null;
+    const f = factores(pM, j, lado, 'retroceso', P, ctx);
+    f.lista.push(['Flujo agresor a favor', flujo == null ? null : Math.sign(flujo) === lado]);
+    f.aFavor = f.lista.filter(x => x[1] === true).length;
+    f.de = f.lista.filter(x => x[1] != null).length;
+    op = {
+      id: `tirador|${marco}|${b.fin}`,
+      regla: 'tirador', marco, lado, i,
+      t: b.fin,
+      entrada, riesgo,
+      riesgoPct: 100 * riesgo / entrada,
+      stop: entrada - lado * riesgo,
+      objetivo1: conPrevio ? previo : entrada + lado * T.parcialMinimoR * riesgo,
+      objetivo2,
+      conPrevio,
+      vence, costoR,
+      toco1: false,
+      estado: 'abierta',
+      mfe: 0,
+      finRecorrido: false,
+      netoBE: null,
+      netoGestion: null,
+      g: { fin: false, parcial: false, r: 0, trail: null },
+      flujoAFavor: flujo == null ? null : Math.sign(flujo) === lado,
+      factores: f,
+    };
+    ops.push(op);
+    seguimiento.push(op);
+    dentro = null;
+    armada = 0;
+  }
+
+  let vivo = { estado: 'sin operación' };
+  if (op) vivo = { estado: 'en operación', op };
+  else if (lado !== 0 && z) {
+    const u = n - 1;
+    let gatillo = lado < 0 ? Infinity : -Infinity;
+    for (let k = u - T.velasRuptura + 1; k <= u; k++) gatillo = lado < 0 ? Math.min(gatillo, v[k].l) : Math.max(gatillo, v[k].h);
+    vivo = { estado: dentro ? 'apuntando' : 'preparando', lado, ...z, gatillo, armada: dentro ? true : armada === lado, factores: factores(pM, j, lado, 'retroceso', P, ctx) };
+  }
+  return { ops, vivo };
+}
+
+// Desde dónde hasta dónde va el movimiento que manda en una temporalidad.
+export function movimiento(p, direccion, C) {
+  const v = p.velas;
+  const u = v.length - 1;
+  let s = u;
+  while (s > 0 && u - s < 300 && direccionEn(p, s - 1, C) !== -direccion) s--;
+  let io = Math.max(0, s - 10);
+  for (let k = io; k <= u; k++) if (direccion > 0 ? v[k].l < v[io].l : v[k].h > v[io].h) io = k;
+  let ie = io;
+  for (let k = io; k <= u; k++) if (direccion > 0 ? v[k].h > v[ie].h : v[k].l < v[ie].l) ie = k;
+  return {
+    desde: direccion > 0 ? v[io].l : v[io].h,
+    tDesde: v[io].t,
+    hasta: direccion > 0 ? v[ie].h : v[ie].l,
+    tHasta: v[ie].t,
+    velas: u - io,
+  };
+}
+
 // ---------- Contexto ----------
 
 // Fase aproximada: busca la ruptura de un rango de N velas que sigue vigente y proyecta su final
@@ -664,22 +844,30 @@ async function traerExtras(simbolo, traer) {
 // La operación que va arriba en la pantalla: primero lo recién confirmado, luego lo que espera
 // confirmación, luego lo que se prepara. A igualdad, más factores a favor y temporalidad más alta.
 // «pesoEvidencia» deja pasar primero las reglas que sí han mostrado resultado en esa temporalidad.
-export function elegirPrincipal(porMarco, operables, ahora, mando, pesoEvidencia) {
-  const peso = { reciente: 5, 'en zona': 4, 'barrido en curso': 3, preparando: 2, 'en operación': 1 };
+// Una zona que queda lejos del precio pesa menos que una operación ya abierta.
+export function elegirPrincipal(porMarco, operables, ahora, mando, pesoEvidencia, opciones = {}) {
+  const peso = { reciente: 5, apuntando: 4, 'en zona': 4, 'barrido en curso': 3, 'en operación': 2, preparando: 1, lejos: 0.5 };
+  const reglas = opciones.reglas || ['tirador', 'retroceso', 'zona', 'barrido'];
   let mejor = null;
   operables.forEach((marco, k) => {
-    for (const regla of ['retroceso', 'zona', 'barrido']) {
+    for (const regla of reglas) {
       const x = porMarco[marco][regla];
       if (!x || !peso[x.estado]) continue;
       let estado = x.estado;
+      let faltaPct = null;
+      if (estado === 'preparando' && opciones.precio != null) {
+        const falta = x.lado < 0 ? x.desde - opciones.precio : opciones.precio - x.hasta;
+        faltaPct = 100 * Math.max(0, falta) / opciones.precio;
+        if (falta > 1.5 * Math.abs(x.invalida - x.ideal) || x.armada === false) estado = 'lejos';
+      }
       const minutos = NATIVAS[marco] || ARMADAS[marco][1];
-      if (estado === 'en operación' && ahora - x.op.t <= 2 * minutos * MIN) estado = 'reciente';
+      if (estado === 'en operación' && ahora - x.op.t <= (regla === 'tirador' ? 4 * 15 : 2 * minutos) * MIN) estado = 'reciente';
       const f = x.op ? x.op.factores : x.factores;
       const lado = x.op ? x.op.lado : x.lado;
       const conFondo = mando && mando.direccionFondo !== 0 && lado === mando.direccionFondo;
       const puntos = (pesoEvidencia ? pesoEvidencia(regla, marco, lado) : 0) * 10000
         + peso[estado] * 1000 + (conFondo ? 100 : 0) + (f ? f.aFavor : 0) * 10 + k;
-      if (!mejor || puntos > mejor.puntos) mejor = { puntos, marco, regla, estado, ...x };
+      if (!mejor || puntos > mejor.puntos) mejor = { puntos, marco, regla, ...x, estado, faltaPct };
     }
   });
   return mejor;
@@ -738,10 +926,16 @@ export async function leerEstado({ simbolo = 'WLDUSDT', parametros: P, traer = f
     porMarco[m] = r.vivo;
     for (const o of r.ops) todas.push(o);
   }
+  for (const m of P.tirador.marcos) {
+    const r = simularTirador(prep['15m'], prep[m], m, P, { superior: prep[P.superior[m]], btc: prepBtc[m] });
+    porMarco[m].tirador = r.vivo;
+    for (const o of r.ops) todas.push(o);
+  }
   todas.sort((a, b) => b.t - a.t);
 
   const lugar = lugarVolatilidad(prep['1h'], prep['1h'].velas.length - 1, { velas: P.volatilidad.horas });
   const mando = quienManda(marcos, P.contexto);
+  const siguiente = ESCALERA[mando.manda ? ESCALERA.indexOf(mando.manda) + 1 : 0];
   return {
     simbolo,
     hora: ahora,
@@ -749,6 +943,9 @@ export async function leerEstado({ simbolo = 'WLDUSDT', parametros: P, traer = f
     extras,
     marcos,
     mando,
+    // Desde dónde hasta dónde va el movimiento que manda, y la temporalidad que sigue.
+    movimiento: mando.manda ? movimiento(prep[mando.manda] || preparar(series[mando.manda], P.contexto), mando.direccion, P.contexto) : null,
+    vigilar: siguiente && marcos[siguiente] && marcos[siguiente].listo ? { marco: siguiente, ...marcos[siguiente] } : null,
     volatilidad: {
       percentil: lugar == null ? null : Math.round(lugar),
       operable: lugar != null && lugar >= P.volatilidad.minimo && lugar <= P.volatilidad.maximo,
@@ -760,6 +957,6 @@ export async function leerEstado({ simbolo = 'WLDUSDT', parametros: P, traer = f
     porMarco,
     vigentes: todas.filter(o => o.estado === 'abierta'),
     senales: todas.filter(o => o.estado === 'cerrada'),
-    principal: elegirPrincipal(porMarco, P.operables, ahora, mando),
+    principal: elegirPrincipal(porMarco, P.operables, ahora, mando, null, { precio }),
   };
 }

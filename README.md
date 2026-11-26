@@ -12,7 +12,9 @@ App para operar WLD/USDT perpetuo en Binance. Sirve como segunda opinión: tú v
 
 ## Qué muestra
 
-- El estado y dónde se espera la entrada: «abre entre tal y tal precio, se invalida si pasa de tal».
+- Lo que manda ahora: temporalidad, dirección y desde dónde hasta dónde va su movimiento; el fondo y la temporalidad a vigilar.
+- Dos opciones: la macro (1 h a 1 D), con entrada de francotirador en 15 m, y la micro (15 y 30 m), y si están alineadas.
+- Dónde se espera la entrada: «abre entre tal y tal precio, se invalida si pasa de tal».
 - Tu idea contra las reglas: corto o largo y a qué precio, con el riesgo y lo que paga.
 - Sesgo y fuerza de las 12 temporalidades, quién manda y cuál es el fondo.
 - Fase del mercado, BTC y mapa del día.
@@ -31,7 +33,7 @@ Nada bloquea. Cada operación trae sus factores a favor y la evidencia medida de
 | Pantalla | Hecha |
 | Lectura de la cuenta de Binance y órdenes | No está; sería después |
 
-En la primera medición ninguna regla alcanzó ventaja demostrada. Las que quedaron a favor son cortos de retroceso con confirmación en 2, 3 y 4 horas, y falta confirmarlas con señales nuevas.
+Ninguna regla ha alcanzado ventaja demostrada. Las que quedaron a favor son los cortos de francotirador con macro de 3 h, 4 h y 1 D, y los cortos de retroceso con confirmación en 2, 3 y 4 horas. Falta confirmarlas con señales nuevas.
 
 ## Las reglas
 
