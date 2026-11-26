@@ -1,0 +1,10 @@
+{
+  "name": "wld-operacion",
+  "private": true,
+  "type": "module",
+  "description": "App para operar WLD/USDT perpetuo en Binance: segunda opinión con reglas declaradas, sin servidores.",
+  "scripts": {
+    "prueba": "node pruebas/autoprueba.mjs",
+    "estado": "node pruebas/estado.mjs"
+  }
+}

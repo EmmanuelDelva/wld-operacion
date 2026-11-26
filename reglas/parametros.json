@@ -1,0 +1,49 @@
+{
+  "version": "borrador 1",
+  "sellado": false,
+  "nota": "Todo aquí es hipótesis. Se sella con una huella antes de correr las pruebas; cualquier cambio después del sello reinicia la validación.",
+  "velas": { "1m": 1500, "5m": 500, "15m": 1500, "1h": 2500, "4h": 500, "1d": 500, "1w": 500 },
+  "contexto": {
+    "emaRapida": 21,
+    "emaLenta": 50,
+    "velasPendiente": 3,
+    "velasFuerza": 20,
+    "fuerzaLateral": 20,
+    "adxTendencia": 25
+  },
+  "volatilidad": { "marco": "1h", "atr": 14, "horas": 2160, "minimo": 20, "maximo": 97 },
+  "costos": { "idaYVueltaPct": 0.20, "estresPct": 0.30 },
+  "swing": {
+    "anchoZonaAtr": 1.0,
+    "margenInvalidacionAtr": 0.35,
+    "invalidacionMinima": 0.015,
+    "velasCancelacion": 12,
+    "objetivo1R": 1.5,
+    "objetivo2R": 2.5,
+    "vencimientoHoras": 72,
+    "confirmacion": { "margenStopAtr1h": 0.25, "stopMinimoPct": 1.5 },
+    "largo": { "stopMinimoPct": 1.8, "fundingMaximoPct": 0.03, "horasFuerzaContraBtc": 24 },
+    "etiquetas": { "grandesCuentas": 1.9 }
+  },
+  "intradia": {
+    "velasRango": 20,
+    "excesoAtr": 0.1,
+    "velasRegreso": 3,
+    "margenStopAtr": 0.15,
+    "stopMinimoPct": 1.3,
+    "rMinimo": 2.0,
+    "vencimientoVelas": 16,
+    "minutosFunding": 5,
+    "variante": { "objetivo1R": 1.2, "objetivo2R": 2.2 },
+    "largo": { "volumenRelativo": 1.1, "horasFuerzaContraBtc": 4 }
+  },
+  "validacion": {
+    "descarte": { "hasta": "2026-09-15", "factorMinimo": 1.20, "factorConEstres": 1.0, "expectativaR": 0.10, "caidaMaximaR": 12, "operacionesMinimas": 100 },
+    "tramoLimpio": { "desde": "2026-09-16", "expectativaMinimaR": -0.05, "caidaMaximaR": 6 },
+    "libro": {
+      "paro": { "senales": 30, "expectativaR": -0.15, "caidaR": 8 },
+      "provisional": { "senales": 60, "expectativaR": 0.12, "factor": 1.25 },
+      "confirmacion": { "senales": 100, "nuevasMinimas": 30 }
+    }
+  }
+}
